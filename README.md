@@ -159,8 +159,8 @@ carries a tarball whose single top-level directory is `sidplayer/`, so it
 extracts straight into the apps folder:
 
 ```
-sha256sum -c opencloud-sidplayer-1.2.0.tar.gz.sha256
-tar -xzf opencloud-sidplayer-1.2.0.tar.gz -C "$WEB_ASSET_APPS_PATH"
+sha256sum -c opencloud-sidplayer-1.2.1.tar.gz.sha256
+tar -xzf opencloud-sidplayer-1.2.1.tar.gz -C "$WEB_ASSET_APPS_PATH"
 ```
 
 `scripts/package.sh` builds the same tarball into `release/`.

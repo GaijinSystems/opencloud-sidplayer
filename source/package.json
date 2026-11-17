@@ -1,6 +1,6 @@
 {
   "name": "sidplayer",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Play Commodore 64 SID music files directly in OpenCloud Web.",
   "license": "AGPL-3.0",
   "type": "module",

@@ -3,6 +3,27 @@
 Each section below is written to stand on its own as the notes for that
 release.
 
+## 1.2.1
+
+The first release built and published by the release workflow, and the
+first under the name OpenCloud SID Player. The app's code is unchanged from
+1.2.0, whose
+[notes in CHANGELOG.md](https://github.com/GaijinSystems/opencloud-sidplayer/blob/main/CHANGELOG.md#120)
+cover everything new since 1.1.8; coming from 1.1.8, read those first, in
+particular their upgrade steps.
+
+- **The release files sit side by side, each with its `.sha256`:** the
+  tarball, its `SHA256SUMS`, `csp.yaml` and `haproxy-hvsc.cfg`. 1.2.0's
+  `scripts/package.sh` put the last two in `release/deploy/`. Check a
+  download with `sha256sum -c ./*.sha256`.
+- **The tarball is reproducible.** The manifest's `builtAt` and every time in
+  the tarball are the commit's, so packaging the same commit gives the same
+  bytes.
+- **The emulator is built, not committed.** `libsidplayfp.wasm` is no longer
+  in the repository. `engine.json` records its sha256, and every build has to
+  reproduce it; `source/engine/build-in-container.sh` builds it in the pinned
+  Emscripten image.
+
 ## 1.2.0
 
 One new way to use the library, and a great deal of fixing and hardening
