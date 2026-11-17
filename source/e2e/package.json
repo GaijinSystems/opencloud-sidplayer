@@ -1,0 +1,9 @@
+{
+  "name": "sidplayer-e2e",
+  "private": true,
+  "type": "module",
+  "description": "Browser smoke test against a running OpenCloud; see README.md",
+  "devDependencies": {
+    "playwright": "1.65.0"
+  }
+}

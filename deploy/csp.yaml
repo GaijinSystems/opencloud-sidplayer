@@ -1,0 +1,48 @@
+# sidplayer — Content Security Policy
+#
+# The SID emulator is libsidplayfp compiled to WebAssembly, and the browser
+# must be allowed to compile it:
+#
+#   script-src 'wasm-unsafe-eval'
+#
+# This permits WebAssembly compilation and nothing else. The engine is built
+# without Embind precisely so the far broader 'unsafe-eval' is NOT needed.
+# Audio is synthesised locally, so media-src is not involved, and the worklet
+# is served from the app's own folder, which 'self' already permits.
+#
+# The policy comes from OpenCloud's own PROXY service, not from your reverse
+# proxy, and is configured with a yaml file:
+#
+#   PROXY_CSP_CONFIG_FILE_LOCATION           deep-merged with the built-in default
+#   PROXY_CSP_CONFIG_FILE_OVERRIDE_LOCATION  REPLACES the default entirely
+#
+# Use the first. If you already have a csp.yaml, add the block to it instead
+# of pointing the variable at this file. Restart the proxy service, then verify
+# in a PRIVATE WINDOW: the old policy is cached with the document.
+#
+#   curl -sI https://cloud.example.org/ | grep -io "script-src[^;]*"
+#
+# Mind the quoting: CSP keywords must reach the browser wrapped in single
+# quotes, so in YAML they are written "'wasm-unsafe-eval'". A bare value is
+# parsed as a hostname and silently does nothing.
+#
+# Without this the app installs and opens tunes, and the player reports
+# "The SID engine could not start" with a CompileError in the message.
+
+#
+# ONE FILE PER INSTANCE. PROXY_CSP_CONFIG_FILE_LOCATION takes a single path,
+# so if something else already uses it - the radio app needs
+# `media-src https:` for its stations - do not point the variable here. Add
+# the script-src block below to the file you already have. A combined one
+# looks like this, and was verified to produce both directives at once:
+#
+#   directives:
+#     script-src:
+#       - "'wasm-unsafe-eval'"   # sidplayer: compile the emulator
+#     media-src:
+#       - "'self'"
+#       - 'https:'               # radio: play third-party stations
+#
+directives:
+  script-src:
+    - "'wasm-unsafe-eval'"

@@ -1,0 +1,34 @@
+# Minimal stack for developing sidplayer against a real OpenCloud.
+# `npm run build:w` rebuilds dist/ on save; the volume mount below puts it
+# where the OpenCloud web runtime discovers apps.
+services:
+  opencloud:
+    image: ${OC_IMAGE:-docker.io/opencloudeu/opencloud-rolling@sha256:12ca1a695fee78001901ebc2fb85680f6a8eabb3e064d18e11a1d28e18cbd657}
+    entrypoint: /bin/sh
+    command: ['-c', 'opencloud init || true && opencloud server']
+    environment:
+      OC_URL: https://localhost:9200
+      OC_INSECURE: 'true'
+      OC_LOG_LEVEL: error
+      IDM_ADMIN_PASSWORD: admin
+      IDM_CREATE_DEMO_USERS: 'true'
+      PROXY_TLS: 'true'
+      WEB_ASSET_APPS_PATH: /web/apps
+      # Deep-merged with the built-in policy. Only needed when the SID engine
+      # is a WebAssembly build; see dev/docker/opencloud/csp.yaml.
+      PROXY_CSP_CONFIG_FILE_LOCATION: /etc/opencloud/csp.yaml
+    ports:
+      # Loopback only. OC_URL above is localhost, the app is developed in a
+      # browser on this machine, and the instance behind this port runs with
+      # IDM_ADMIN_PASSWORD=admin and the demo users enabled - which is fine on
+      # a laptop and an open door on a shared or office network. Change the
+      # host side deliberately if you really want it reachable.
+      - '127.0.0.1:9200:9200'
+    volumes:
+      - opencloud-config:/etc/opencloud
+      - ./dev/docker/opencloud/apps.yaml:/etc/opencloud/apps.yaml
+      - ./dev/docker/opencloud/csp.yaml:/etc/opencloud/csp.yaml
+      - ./dist:/web/apps/sidplayer
+
+volumes:
+  opencloud-config:

@@ -1,0 +1,21 @@
+Third-party components bundled with the SID Player for OpenCloud Web
+=====================================================================
+
+libsidplayfp and reSIDfp
+  https://github.com/libsidplayfp/libsidplayfp
+  Copyright (C) 2000 Simon White, 2007-2010 Antti Lankila,
+  2010-2024 Leandro Nini, and contributors.
+  Licence: GNU General Public License, version 2 or later.
+  Shipped as vendor/sid-engine/libsidplayfp.wasm, compiled from the release
+  named in source/engine/build.sh via source/engine/shim.cpp. The full licence
+  text is in vendor/sid-engine/LICENSE-libsidplayfp.txt. Corresponding source
+  is the upstream release tarball plus this app's source/engine/ directory.
+
+C64 ROM images (kernal.bin, basic.bin, chargen.bin)
+  The Commodore 64 KERNAL, BASIC and character ROMs, copyright Commodore
+  Business Machines and its successors in title. They are not covered by
+  this app's licence. They are included so that RSID and BASIC tunes play;
+  remove them, or build with scripts/package.sh --no-roms, where that is
+  not a redistribution you are able to make. Without them PSID tunes still play.
+
+The SID Player itself is AGPL-3.0, matching OpenCloud.

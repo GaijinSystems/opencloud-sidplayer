@@ -1,0 +1,15 @@
+{
+  "registerAsDefault": true,
+  "clickPlaysInPlace": true,
+  "maxFileSizeKb": 1024,
+  "defaultSongLengthSeconds": 180,
+  "autoPlay": true,
+  "analyserEnabled": true,
+  "assetBaseUrl": null,
+  "engineBaseUrl": null,
+  "songlengthsUrl": null,
+  "hvscPath": "/SID Library",
+  "hvscMirrorPath": "/hvsc-mirror",
+  "buildTag": null,
+  "version": null
+}

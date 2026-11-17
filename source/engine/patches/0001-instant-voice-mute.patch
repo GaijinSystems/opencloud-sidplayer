@@ -1,0 +1,133 @@
+Make per-voice mute take effect while the tune plays.
+
+Upstream reSIDfp implements SID::mute() by substituting 0 for the next value
+the tune writes to the voice's control register ($D404/$D40B/$D412). A mute
+therefore does nothing until the tune happens to write that register, and a
+tune that writes it once at init - which is legal, and what tone.sid and
+tone3.sid in tests/fixtures do - can never be muted at all while it plays.
+From a listener's seat the feature looks broken: you press the button and
+nothing happens.
+
+This moves the mute to the mixing stage instead. The voice keeps running, so
+its oscillator and envelope stay in step with the tune and with any
+neighbouring voice that uses it for ring modulation or oscillator sync; only
+its contribution to the filter input is faded out. Control-register writes
+are passed through unaltered, so sync and ring-mod partners of a muted voice
+sound exactly as they would unmuted, which upstream's version cannot manage.
+
+The fade, rather than a hard zero, is there because a 6581 voice sits on a
+DC pedestal of its own: dropping it in one sample steps the filter input and
+the external high-pass turns that step into an audible thump, measured at
+-17 dBFS peak and decaying over about 0.8 s. Spreading the change over 4096
+clocks, a little over 4 ms, makes a mute silent while still being instant to
+a listener.
+
+Applies to libsidplayfp 2.6.0. Verified by scripts/verify-engine.mjs, which
+measures each voice's partial in the mix while muting it live.
+
+--- a/src/builders/residfp-builder/residfp/SID.h
++++ b/src/builders/residfp-builder/residfp/SID.h
+@@ -109,6 +109,13 @@
+     bool muted[3];
+ 
+     /**
++     * Per-voice mute gain, 0..1, moving towards the flag above one step at a
++     * time so that a mute fades instead of stepping the filter input.
++     * Mutable because it is advanced from output(), which is const.
++     */
++    mutable float muteGain[3];
++
++    /**
+      * Emulated nonlinearity of the envelope DAC.
+      *
+      * @See Dac
+@@ -131,6 +138,14 @@
+     void ageBusValue(unsigned int n);
+ 
+     /**
++     * Advance one voice's mute gain by a step and return it.
++     *
++     * @param channel the voice
++     * @return the gain to apply to that voice this clock
++     */
++    float muteRamp(int channel) const;
++
++    /**
+      * Get output sample.
+      *
+      * @return the output sample
+@@ -315,11 +330,34 @@
+ }
+ 
+ RESID_INLINE
++float SID::muteRamp(int channel) const
++{
++    // 4096 clocks from silent to full, a little over 4 ms on a PAL machine.
++    const float STEP = 1.0f / 4096.0f;
++    const float target = muted[channel] ? 0.0f : 1.0f;
++    float gain = muteGain[channel];
++
++    if (gain < target)
++    {
++        gain += STEP;
++        if (gain > target) gain = target;
++    }
++    else if (gain > target)
++    {
++        gain -= STEP;
++        if (gain < target) gain = target;
++    }
++
++    muteGain[channel] = gain;
++    return gain;
++}
++
++RESID_INLINE
+ int SID::output() const
+ {
+-    const int v1 = voice[0]->output(voice[2]->wave());
+-    const int v2 = voice[1]->output(voice[0]->wave());
+-    const int v3 = voice[2]->output(voice[1]->wave());
++    const int v1 = static_cast<int>(muteRamp(0) * voice[0]->output(voice[2]->wave()));
++    const int v2 = static_cast<int>(muteRamp(1) * voice[1]->output(voice[0]->wave()));
++    const int v3 = static_cast<int>(muteRamp(2) * voice[2]->output(voice[1]->wave()));
+ 
+     const int input = (scaleFactor * static_cast<unsigned int>(filter->clock(v1, v2, v3))) / 2;
+ 
+--- a/src/builders/residfp-builder/residfp/SID.cpp
++++ b/src/builders/residfp-builder/residfp/SID.cpp
+@@ -145,6 +145,7 @@
+     voice[2].reset(new Voice());
+ 
+     muted[0] = muted[1] = muted[2] = false;
++    muteGain[0] = muteGain[1] = muteGain[2] = 1.0f;
+ 
+     reset();
+     setChipModel(MOS8580);
+@@ -355,7 +356,7 @@
+         break;
+ 
+     case 0x04: // Voice #1 control register
+-        voice[0]->writeCONTROL_REG(muted[0] ? 0 : value);
++        voice[0]->writeCONTROL_REG(value);
+         break;
+ 
+     case 0x05: // Voice #1 Attack and Decay length
+@@ -383,7 +384,7 @@
+         break;
+ 
+     case 0x0b: // Voice #2 control register
+-        voice[1]->writeCONTROL_REG(muted[1] ? 0 : value);
++        voice[1]->writeCONTROL_REG(value);
+         break;
+ 
+     case 0x0c: // Voice #2 Attack and Decay length
+@@ -411,7 +412,7 @@
+         break;
+ 
+     case 0x12: // Voice #3 control register
+-        voice[2]->writeCONTROL_REG(muted[2] ? 0 : value);
++        voice[2]->writeCONTROL_REG(value);
+         break;
+ 
+     case 0x13: // Voice #3 Attack and Decay length

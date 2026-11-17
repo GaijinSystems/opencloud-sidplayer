@@ -1,0 +1,92 @@
+Start the external filter settled, not charging.
+
+A Commodore 64 couples its audio out through a DC blocker, which reSIDfp
+models as a 1.6 Hz high-pass in ExternalFilter. Upstream resets both of its
+networks to zero, so every tune begins with the filter uncharged and the
+chip's whole DC pedestal reaches the output until the high-pass drains it,
+which takes the better part of a second.
+
+That used to be a harmless thump. libsidplayfp 2.6.0 amplified the signal
+path ("residfp: amplify the output by a model dependent scale factor", and
+2.5.0 "tweaked the 8580 filter parameters for increased volume"), and there
+is no longer headroom for the pedestal on top: measured on an 8580 tune, the
+first second peaked at full scale with about 480 samples of 44,100 clipped
+and a mean sample value of 0.168, settling afterwards to a peak of 0.236.
+The same tune through libsidplayfp 2.4.2 peaks at 0.20 from the first sample
+and never clips.
+
+With a constant input both networks converge on the input voltage, so the
+settled state is simply Vlp = Vhp = Vi. This seeds them from the first sample
+after a reset rather than guessing a constant per chip model and volume
+setting: whatever DC the chip is producing, the filter starts there, and one
+sample of silence is returned in place of the step.
+
+The alternatives were worse. An output gain would have to be about 12 dB to
+clear a transient four times the steady level, making the whole collection
+quiet to fix the first second of it; a second DC blocker in the player would
+stack another high-pass on the one already modelled here, altering the bass
+of everything, and would shorten the step rather than remove it.
+
+Reset covers subsong changes and tune switches too: the worklet reloads the
+tune for both, and SID::reset() calls ExternalFilter::reset().
+
+Applies to libsidplayfp 2.6.0. Verified by scripts/verify-engine.mjs, which
+renders the first second of a tune that asks for an 8580 and fails if any
+sample reaches full scale.
+
+--- a/src/builders/residfp-builder/residfp/ExternalFilter.h
++++ b/src/builders/residfp-builder/residfp/ExternalFilter.h
+@@ -70,6 +70,13 @@
+     /// Highpass filter voltage
+     int Vhp;
+ 
++    /**
++     * False until the first sample after a reset has been seen, so that both
++     * networks can start charged to whatever DC the chip is actually putting
++     * out rather than ramping up to it from nothing.
++     */
++    bool primed;
++
+     int w0lp_1_s7;
+ 
+     int w0hp_1_s17;
+@@ -111,6 +118,25 @@
+ int ExternalFilter::clock(int input)
+ {
+     const int Vi = (input<<11) - (1 << (11+15));
++
++    if (!primed)
++    {
++        /*
++         * Start settled instead of charging up over the first second.
++         *
++         * With a constant input both networks converge on Vi, so seeding them
++         * from the first sample puts the filter where it would have ended up
++         * anyway. Starting from zero instead passes the chip's whole DC
++         * pedestal through until the 1.6 Hz high-pass drains it, and since
++         * libsidplayfp 2.6.0 amplified the signal path there is no longer the
++         * headroom for that: the first second of an 8580 tune clipped.
++         */
++        primed = true;
++        Vlp = Vi;
++        Vhp = Vi;
++        return 0;
++    }
++
+     const int dVlp = (w0lp_1_s7 * (Vi - Vlp) >> 7);
+     const int dVhp = (w0hp_1_s17 * (Vlp - Vhp) >> 17);
+     Vlp += dVlp;
+--- a/src/builders/residfp-builder/residfp/ExternalFilter.cpp
++++ b/src/builders/residfp-builder/residfp/ExternalFilter.cpp
+@@ -60,9 +60,10 @@
+ 
+ void ExternalFilter::reset()
+ {
+-    // State of filter.
++    // State of filter. Seeded from the first sample instead, in clock().
+     Vlp = 0; //1 << (15 + 11);
+     Vhp = 0;
++    primed = false;
+ }
+ 
+ } // namespace reSIDfp

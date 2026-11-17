@@ -1,0 +1,5 @@
+sidplayer:
+  config:
+    # Short default length in dev so end-of-song handling is easy to exercise.
+    defaultSongLengthSeconds: 20
+    autoPlay: true

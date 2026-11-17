@@ -1,0 +1,11 @@
+node_modules/
+dist/
+coverage/
+.__mf__temp/
+*.log
+# The three C64 ROM images the engine uses are tracked; copies under any
+# other name are not, and prune-dist would drop them from a build anyway.
+public/vendor/sid-engine/*.bin
+!public/vendor/sid-engine/kernal.bin
+!public/vendor/sid-engine/basic.bin
+!public/vendor/sid-engine/chargen.bin

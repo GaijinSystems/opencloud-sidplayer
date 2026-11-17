@@ -1,0 +1,7 @@
+# Development policy fragment. Deep-merged with OpenCloud's built-in policy
+# via PROXY_CSP_CONFIG_FILE_LOCATION, so only the additions are listed.
+#
+# Required: the SID engine is a WebAssembly build of libsidplayfp.
+directives:
+  script-src:
+    - "'wasm-unsafe-eval'"

@@ -1,0 +1,14 @@
+# Built, fetched or generated: not ours to format.
+dist/
+node_modules/
+e2e/node_modules/
+e2e/.mirror/
+e2e/.certs/
+e2e/.oc-config/
+e2e/out/
+engine/build/
+tests/fixtures/
+package-lock.json
+e2e/package-lock.json
+# Prose, whose tables and line breaks are laid out by hand.
+*.md

@@ -1,0 +1,10 @@
+# Headless Chromium + Playwright on the same Node base the app builds with,
+# so the two images share their largest layer. Built once:
+#   podman build -t sidplayer-e2e -f e2e/Containerfile e2e
+# By digest, the same one scripts/package.sh builds with: a tag is whatever
+# the registry says it is on the day.
+FROM docker.io/library/node:22-bookworm@sha256:0e5f906573693feaa1e21057ebdcfdb5bd5021f050b2dc7c9deceb629c7da2a8
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+RUN npx -y playwright@1.65.0 install --with-deps chromium \
+  && rm -rf /var/lib/apt/lists/* /root/.npm
+WORKDIR /e2e
