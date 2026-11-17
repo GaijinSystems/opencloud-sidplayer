@@ -1,0 +1,232 @@
+### Excerpt of HVSC STIL.txt (release 85) for the demo tunes ###
+
+/MUSICIANS/D/Daglish_Ben/
+COMMENT: Comments from Ben Daglish are denoted (BD)
+         Q: Is it Ben or Benn?
+         A: "Ben is my real name....Benn was a nick from Compu-Net days - the
+         double letter was all the rage...Ratt, Bogg etc. etc." (BD)
+         Sadly, Ben Daglish passed away on October 1st, 2018, at the age of 52,
+         due to complications from lung cancer.
+
+/MUSICIANS/F/Feil_Georg/
+COMMENT: All comments by Georg Feil are denoted by (GF).
+
+/MUSICIANS/G/Galway_Martin/
+COMMENT: Martin Galway's own comments are denoted (MG).
+         "I will never do rearrangements of those tunes on other instruments,
+         the SID is what they're meant to be heard on. It would not be
+         'updating' them to put them onto a different instrument. If you ever
+         hear music from me on today's instruments, the tunes will be all-new
+         (and probably a lot better)." (MG)
+
+/MUSICIANS/H/Hubbard_Rob/
+COMMENT: People have often stolen Hubbard's routine causing some tunes to be
+         falsely credited to him.
+         Hubbard's own comments are denoted (RH).
+
+/GAMES/M-R/M_U_L_E.sid
+(#2)
+COMMENT: Almost identical to tune #1.
+
+/MUSICIANS/D/Daglish_Ben/Last_Ninja.sid
+COMMENT: "I got the phone call from Mark [Cale] asking me to write some level
+         tunes - I wrote the music, went down there [to System 3] to meet
+         Archer Maclean (? I think it was Arch that put the driver in.....),
+         got offered Mark Cale's slightly-dodgy-import-status left-hand-drive
+         BMW, said "no thanks, I'll have the cash please" and that was that."
+         (BD)
+         Q: How was Anthony Lees to work with?
+         A: "Only met the guy once - on that one day - he said 'hi' - I said
+         'hi' - that was about it." (BD)
+         The titles of the individual tunes found below are based on as they
+         appear in the game.
+(#1)
+   NAME: The Wilderness (loader)
+ AUTHOR: Anthony Lees
+(#2)
+   NAME: Palace Gardens (loader)
+ AUTHOR: Anthony Lees
+COMMENT: "I did six tunes for LN, the first of which was the one involving the
+         creepy jungle music (....which was and still is my favourite) - the
+         inspiration is hard to nail down, but it was probably the film
+         'Apocalypse Now' - very dense, troubled and scary moods were evoked."
+         (Anthony Lees)
+(#3)
+   NAME: The Wastelands (loader)
+ AUTHOR: Ben Daglish
+(#4)
+   NAME: The Palace (loader)
+ AUTHOR: Anthony Lees
+(#5)
+   NAME: The Inner Sanctum (loader)
+ AUTHOR: Anthony Lees
+COMMENT: Interesting comment in this binary: "DONE BY ANTHONY LEES FOR SYSTEM 3
+         ON 5/4/87...EAT YER HEART OUT GALWAY!".
+(#6)
+   NAME: The Wastelands
+ AUTHOR: Ben Daglish
+(#7)
+   NAME: The Wilderness
+ AUTHOR: Ben Daglish
+(#8)
+   NAME: Palace Gardens
+ AUTHOR: Ben Daglish
+(#9)
+   NAME: The Dungeons
+ AUTHOR: Anthony Lees
+(#10)
+   NAME: The Palace
+COMMENT: Although the tune is credited to Anthony Lees since 2001 in HVSC, the
+         music player of this tune is by Ben Daglish. Ben doesn't remember making
+         this tune and also he has no idea how the tune ended up being in his
+         player if it was made by Anthony Lees. It could be that the music was
+         credited to Anthony Lees because Anthony claimed to have made 6 tunes
+         for the game while actually 5 are made in his player.
+         Since Anthony passed away, we can't verify it anymore and it will be a
+         mystery who of the two actually made the tune.
+(#11)
+   NAME: The Dungeons (loader)
+ AUTHOR: Ben Daglish
+COMMENT: This is also the tune for "The Inner Sanctum".
+
+/MUSICIANS/D/Daglish_Ben/Trap.sid
+(#1)
+  TITLE: Eve of the War [from War of the Worlds] (3:35-3:54)
+ ARTIST: Jeff Wayne
+COMMENT: Made famous by the We M.U.S.I.C. movie demo, titled "The Gladiator",
+         which featured a drummer drumming to rhythm in the lower left corner
+         of the screen, and showed a movie in the upper right.
+
+/MUSICIANS/D/Dunn_Jonathan/Vindicator.sid
+(#10)
+  TITLE: The Sound of Music [from the movie] (2:46-2:51)
+ ARTIST: Irwin Kostal & Richard Rodgers, performed by Julie Andrews
+  TITLE: James Bond Theme [from the James Bond series of movies] (3:50-4:05)
+ ARTIST: Monty Norman
+COMMENT: The characteristic 007 chromatic chord progression can be heard.
+
+/MUSICIANS/F/Feil_Georg/Synth_Sample.sid
+COMMENT: "I wrote it around '84 or '85 as a demo for my music editor called
+         'Synth'. I was going to University of Waterloo at the time and just
+         gave it to a friend of mine... didn't even bother to put my name on
+         the thing. Anyway it soon started cropping up all over the place.
+         I never made any sequels with music, although there was something with
+         annoying sound effects done in the same style as Synth Sample that I
+         posted in the beginning of 1994. So any music you see that looks like
+         a sequel or has graphics added was done by someone else.
+         Anyway the computer bust of 85/86(?) hit and Synth was never marketed.
+         I had been negotiating with a software company but they went out of
+         business. By that time I was working on a new version of Synth that
+         was a sequencer program for Midi instruments (called MSS), and had
+         joined my first band. I've been in a couple other bands since then,
+         the last one was called SugarPush and we came close to getting signed
+         (but then broke up [...]). So I guess you can credit that little
+         program with launching my musical career..." (GF)
+(#1)
+  TITLE: Theme from A Stationary Ark
+ ARTIST: John Mills-Cockell
+COMMENT: "Theme from Stationary Ark, a nature show on PBS. [...] It appears on
+         Synth Sample as interpreted by a friend of mine. I didn't know what it
+         was myself until I happened to see Stationary Ark one time. This song
+         does not play properly on some C-64's where the SID chip filter is
+         calibrated differently." (GF)
+(#2)
+  TITLE: Saturdays in Silesia [from Cold War Night Life]
+ ARTIST: Rational Youth
+COMMENT: "A fluffy pop song I taped off the radio. Seemed simple enough to
+         render on the C-64." (GF)
+         Also used in the game "Shocker", (C) 1987 Systems Editoriale.
+(#3)
+  TITLE: Spiral [from Spiral]
+ ARTIST: Vangelis
+(#4)
+  TITLE: Tubular Bells, Part 1 [from Tubular Bells]
+ ARTIST: Mike Oldfield
+COMMENT: A little free-hand adaptation.
+         "I just thought this was ultra cool. Used as the music to The
+         Exorcist, unfortunately." (GF)
+(#5)
+  TITLE: Magic Shadows, closing theme
+ ARTIST: Harry Forbes
+COMMENT: "Magic Shadows was a half-hour movie show on TV Ontario, sort of the
+         Canadian equivalent of PBS. They'd show old movies in half-hour
+         installments. I have no idea if there's an album. I taped it off the
+         TV." (GF)
+(#6)
+  TITLE: Funeral Music for Queen Mary
+ ARTIST: Henry Purcell
+(#7)
+  TITLE: Oxygene 2 [from Oxygene]
+ ARTIST: Jean-Michel Jarre
+(#8)
+  TITLE: Canon in D major
+ ARTIST: Johann Pachelbel
+COMMENT: "This is a very popular classical hit. I transcribed the notes from a
+         Transactor or Compute! article (this is the only Synth Sample piece
+         not transcribed by ear)." (GF)
+(#9)
+  TITLE: Enola Gay [from Organisation]
+ ARTIST: George Andrew McCluskey, performed by Orchestral Manoeuvres in the Dark (OMD)
+
+### /MUSICIANS/F/Feiweier_Goesta #############################################
+
+/MUSICIANS/G/Galway_Martin/Wizball.sid
+(#2)
+COMMENT: The opening bars of this tune are sampled by the group Console on
+         their song "14 Zero Zero".
+(#4)
+COMMENT: "I was working at the Sensible Software office at the time of the
+         major music creation, but the title screen music never got finished.
+         When I returned to Ocean I got on with some other things, all the time
+         worrying about this unfinished tune. Finally I slapped something on
+         the end of it. I knew I could never top the first part, that's what
+         the problem was. In my mind the second part of the tune is pretty lame
+         compared with the first part. But for some people it represents the
+         mysterious, magical, unconventional aspect of 'Wizball' so it fits in
+         some ways. But you can tell it's not really like the other music in
+         the game, which was primarily developed when I was with the Sensi
+         boys, basking in that Sensi VIBE." (MG)
+         "I really worked on the sound design of the voices a lot. The music
+         seems to "flow" and "breathe" unlike anything before it." (MG)
+(#5)
+COMMENT: "Tune #5, the bonus screen tune, consists of several short riffs, and
+         John Hare came up with the most musical ones on his bass guitar. I
+         remember he would come up with the riffs, playing them over and over
+         at full volume on his band's P.A. in their rented terraced house in
+         Southend (not caring about what the neighbours thought!!!) - and while
+         they went out to get me a "blow-out" burger at 3am, I would be
+         transcribing it and enhancing it (a little)." (MG)
+(#7)
+COMMENT: "I composed the high-score music at Ocean after returning from
+         Southend. Played it on the synth keyboard there. It's one of the few
+         compositions of mine that I can actually play a decent rendition of on
+         the piano." (MG)
+(#8)
+COMMENT: "Chris Yates wrote the game over riff on his electric guitar. They
+         were pretty impressed by the translation when they came back with my
+         blow-out." (MG)
+
+/MUSICIANS/H/Hubbard_Rob/International_Karate.sid
+COMMENT: "[...] I started exploring pentatonic things in B flat minor over
+         different bass notes, B flat, D flat, G flat and A flat. The middle
+         section went into F (I think) at double tempo to liven things up. I
+         was pleased with the tune......" (RH)
+         The music was written over a 3 week period.
+  TITLE: Merry Christmas, Mr. Lawrence [from the movie] (0:42-1:16)
+ ARTIST: Ryuichi Sakamoto
+  TITLE: Merry Christmas, Mr. Lawrence [from the movie] (2:57-4:04)
+ ARTIST: Ryuichi Sakamoto
+  TITLE: Merry Christmas, Mr. Lawrence [from the movie] (9:12-10:26)
+ ARTIST: Ryuichi Sakamoto
+
+/MUSICIANS/H/Hubbard_Rob/Monty_on_the_Run.sid
+(#1)
+  TITLE: The Devil's Gallop [from the Dick Barton radio show]
+ ARTIST: Charles Williams
+COMMENT: Heavily inspired by the song Devil's Gallop, which was the title theme
+         for the 1940's American detective radio show "Dick Barton". "Monty
+         [...] started out as the theme from the old radio detective show, Dick
+         Barton" (RH, in the UK magazine "Popular Computing")
+         "MOTR was supposed to be this run around like a madman type music and
+         has lots of energy. The middle section was an excuse to use the new
+         pitch bend code that I wrote for this project." (RH)

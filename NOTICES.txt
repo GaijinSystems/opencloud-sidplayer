@@ -1,0 +1,18 @@
+SID Player for OpenCloud - demo site
+
+The SID Player is AGPL-3.0; see LICENSE.
+
+libsidplayfp and reSIDfp (vendor/sid-engine/libsidplayfp.wasm) are
+GPL-2.0-or-later; see vendor/sid-engine/LICENSE-libsidplayfp.txt.
+
+The Commodore 64 KERNAL, BASIC and character ROMs (vendor/sid-engine/*.bin)
+are copyright Commodore Business Machines and its successors in title, and
+not covered by this project's licence.
+
+The page's styles, components and icons are OpenCloud's (AGPL-3.0); the icons
+are Remix Icon (Apache-2.0); the Inter typeface is under the SIL Open Font
+License 1.1.
+
+The tunes are from the High Voltage SID Collection (release 85) and the
+Compute's Gazette SID Collection, and belong to their composers. The excerpts
+of HVSC's Songlengths.md5, STIL.txt and Musicians.txt are the collection's own.

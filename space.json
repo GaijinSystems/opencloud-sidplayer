@@ -1,0 +1,96 @@
+[
+ {
+  "path": "/SID Library/.sidplayer/favourites.json",
+  "text": "{\n  \"version\": 1,\n  \"items\": [\n    {\n      \"path\": \"/MUSICIANS/D/Dunn_Jonathan/Vindicator.sid\",\n      \"md5\": \"18bbcdcd7522699b93a999f6246e9632\",\n      \"at\": \"2026-11-16T00:00:00.000Z\",\n      \"rank\": 0,\n      \"rankedAt\": \"2026-11-16T00:00:00.000Z\"\n    },\n    {\n      \"path\": \"/MUSICIANS/T/The_Syndrom/Mystery.sid\",\n      \"md5\": \"3c38a7723449053e2672332ebad71e29\",\n      \"at\": \"2026-11-16T00:00:00.000Z\",\n      \"rank\": 1,\n      \"rankedAt\": \"2026-11-16T00:00:00.000Z\"\n    },\n    {\n      \"path\": \"/GAMES/M-R/M_U_L_E.sid\",\n      \"md5\": \"0b323f4c5266675884170604699a21d3\",\n      \"at\": \"2026-11-16T00:00:00.000Z\",\n      \"rank\": 2,\n      \"rankedAt\": \"2026-11-16T00:00:00.000Z\"\n    },\n    {\n      \"path\": \"/MUSICIANS/D/Daglish_Ben/Trap.sid\",\n      \"md5\": \"c43379003c52b8f76fbe729b991f41e7\",\n      \"at\": \"2026-11-16T00:00:00.000Z\",\n      \"rank\": 3,\n      \"rankedAt\": \"2026-11-16T00:00:00.000Z\"\n    },\n    {\n      \"path\": \"/A_Brown/Ripleys_Believe_it_or_not.mus\",\n      \"collection\": \"cgsc\",\n      \"md5\": \"\",\n      \"at\": \"2026-11-16T00:00:00.000Z\",\n      \"rank\": 4,\n      \"rankedAt\": \"2026-11-16T00:00:00.000Z\"\n    },\n    {\n      \"path\": \"/MUSICIANS/H/Hubbard_Rob/International_Karate.sid\",\n      \"md5\": \"f0cb46765db995d57d93d11ef600a04d\",\n      \"at\": \"2026-11-16T00:00:00.000Z\",\n      \"rank\": 5,\n      \"rankedAt\": \"2026-11-16T00:00:00.000Z\"\n    },\n    {\n      \"path\": \"/MUSICIANS/D/Daglish_Ben/Last_Ninja.sid\",\n      \"md5\": \"4e43a3a1d7cbf8755fa284bee4a47b00\",\n      \"at\": \"2026-11-16T00:00:00.000Z\",\n      \"rank\": 6,\n      \"rankedAt\": \"2026-11-16T00:00:00.000Z\"\n    },\n    {\n      \"path\": \"/MUSICIANS/H/Hubbard_Rob/Monty_on_the_Run.sid\",\n      \"md5\": \"793f0300acaca2f4c6ba23910f65c2e6\",\n      \"at\": \"2026-11-16T00:00:00.000Z\",\n      \"rank\": 7,\n      \"rankedAt\": \"2026-11-16T00:00:00.000Z\"\n    },\n    {\n      \"path\": \"/MUSICIANS/F/Feil_Georg/Synth_Sample.sid\",\n      \"md5\": \"37e80f4ae3ea16dc59a0a4afc52d2ea5\",\n      \"at\": \"2026-11-16T00:00:00.000Z\",\n      \"rank\": 8,\n      \"rankedAt\": \"2026-11-16T00:00:00.000Z\"\n    },\n    {\n      \"path\": \"/MUSICIANS/G/Galway_Martin/Wizball.sid\",\n      \"md5\": \"4522f889d5c41b3e08a00873a9e4b63a\",\n      \"at\": \"2026-11-16T00:00:00.000Z\",\n      \"rank\": 9,\n      \"rankedAt\": \"2026-11-16T00:00:00.000Z\"\n    }\n  ],\n  \"removed\": []\n}\n",
+  "size": 2250
+ },
+ {
+  "path": "/SID Library/.sidplayer/status.json",
+  "text": "{\n  \"release\": 85,\n  \"upstream\": null,\n  \"checkedAt\": null,\n  \"mode\": \"online\"\n}\n",
+  "size": 81
+ },
+ {
+  "path": "/SID Library/C64Music/GAMES/M-R/M_U_L_E.sid",
+  "url": "space/C64Music/GAMES/M-R/M_U_L_E.sid",
+  "size": 1732,
+  "md5": "0b323f4c5266675884170604699a21d3"
+ },
+ {
+  "path": "/SID Library/C64Music/MUSICIANS/D/Daglish_Ben/Last_Ninja.sid",
+  "url": "space/C64Music/MUSICIANS/D/Daglish_Ben/Last_Ninja.sid",
+  "size": 35617,
+  "md5": "4e43a3a1d7cbf8755fa284bee4a47b00"
+ },
+ {
+  "path": "/SID Library/C64Music/MUSICIANS/D/Daglish_Ben/Trap.sid",
+  "url": "space/C64Music/MUSICIANS/D/Daglish_Ben/Trap.sid",
+  "size": 4478,
+  "md5": "c43379003c52b8f76fbe729b991f41e7"
+ },
+ {
+  "path": "/SID Library/C64Music/MUSICIANS/D/Dunn_Jonathan/Vindicator.sid",
+  "url": "space/C64Music/MUSICIANS/D/Dunn_Jonathan/Vindicator.sid",
+  "size": 23166,
+  "md5": "18bbcdcd7522699b93a999f6246e9632"
+ },
+ {
+  "path": "/SID Library/C64Music/MUSICIANS/F/Feil_Georg/Synth_Sample.sid",
+  "url": "space/C64Music/MUSICIANS/F/Feil_Georg/Synth_Sample.sid",
+  "size": 16393,
+  "md5": "37e80f4ae3ea16dc59a0a4afc52d2ea5"
+ },
+ {
+  "path": "/SID Library/C64Music/MUSICIANS/G/Galway_Martin/Wizball.sid",
+  "url": "space/C64Music/MUSICIANS/G/Galway_Martin/Wizball.sid",
+  "size": 7769,
+  "md5": "4522f889d5c41b3e08a00873a9e4b63a"
+ },
+ {
+  "path": "/SID Library/C64Music/MUSICIANS/H/Hubbard_Rob/International_Karate.sid",
+  "url": "space/C64Music/MUSICIANS/H/Hubbard_Rob/International_Karate.sid",
+  "size": 4734,
+  "md5": "f0cb46765db995d57d93d11ef600a04d"
+ },
+ {
+  "path": "/SID Library/C64Music/MUSICIANS/H/Hubbard_Rob/Monty_on_the_Run.sid",
+  "url": "space/C64Music/MUSICIANS/H/Hubbard_Rob/Monty_on_the_Run.sid",
+  "size": 5694,
+  "md5": "793f0300acaca2f4c6ba23910f65c2e6"
+ },
+ {
+  "path": "/SID Library/C64Music/MUSICIANS/T/The_Syndrom/Mystery.sid",
+  "url": "space/C64Music/MUSICIANS/T/The_Syndrom/Mystery.sid",
+  "size": 6833,
+  "md5": "3c38a7723449053e2672332ebad71e29"
+ },
+ {
+  "path": "/SID Library/CGSC/A_Brown/Ripleys_Believe_it_or_not.mus",
+  "url": "space/CGSC/A_Brown/Ripleys_Believe_it_or_not.mus",
+  "size": 844,
+  "md5": "cb001e698a1073008f7dd329773ef545"
+ },
+ {
+  "path": "/SID Library/C64Music/DOCUMENTS/Songlengths.md5",
+  "url": "space/C64Music/DOCUMENTS/Songlengths.md5",
+  "size": 1062,
+  "md5": "e75554ab891acfb4c179825f312d2b9b"
+ },
+ {
+  "path": "/SID Library/C64Music/DOCUMENTS/STIL.txt",
+  "url": "space/C64Music/DOCUMENTS/STIL.txt",
+  "size": 10870,
+  "md5": "c05a301a90e6aed4e85523faafb5aa93"
+ },
+ {
+  "path": "/SID Library/C64Music/DOCUMENTS/Musicians.txt",
+  "url": "space/C64Music/DOCUMENTS/Musicians.txt",
+  "size": 85273,
+  "md5": "fb348d4dd66eed04bca524397f3cf8fa"
+ },
+ {
+  "path": "/SID Library/C64Music/DOCUMENTS/HVSC.txt",
+  "url": "space/C64Music/DOCUMENTS/HVSC.txt",
+  "size": 135,
+  "md5": "d3045465e004bed9f0e1f8c2126ce1ca"
+ }
+]
