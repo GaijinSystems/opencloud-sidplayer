@@ -8,7 +8,7 @@ import { demoSpace } from '../demoSpace'
 
 export function useDocumentTitle({ titleSegments }: { titleSegments: Ref<string[]> }): void {
   watchEffect(() => {
-    document.title = [...titleSegments.value, 'SID Player demo'].filter(Boolean).join(' - ')
+    document.title = [...titleSegments.value, 'OpenCloud SID Player demo'].filter(Boolean).join(' - ')
   })
 }
 

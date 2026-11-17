@@ -1,6 +1,6 @@
-SID Player for OpenCloud - demo site
+OpenCloud SID Player - demo site
 
-The SID Player is AGPL-3.0; see LICENSE.
+OpenCloud SID Player is AGPL-3.0; see LICENSE.
 
 libsidplayfp and reSIDfp (vendor/sid-engine/libsidplayfp.wasm) are
 GPL-2.0-or-later; see vendor/sid-engine/LICENSE-libsidplayfp.txt.

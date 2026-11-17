@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "path": "/MUSICIANS/D/Dunn_Jonathan/Vindicator.sid",
+      "md5": "18bbcdcd7522699b93a999f6246e9632",
+      "at": "2026-11-16T00:00:00.000Z",
+      "rank": 0,
+      "rankedAt": "2026-11-16T00:00:00.000Z"
+    },
+    {
+      "path": "/MUSICIANS/T/The_Syndrom/Mystery.sid",
+      "md5": "3c38a7723449053e2672332ebad71e29",
+      "at": "2026-11-16T00:00:00.000Z",
+      "rank": 1,
+      "rankedAt": "2026-11-16T00:00:00.000Z"
+    },
+    {
+      "path": "/GAMES/M-R/M_U_L_E.sid",
+      "md5": "0b323f4c5266675884170604699a21d3",
+      "at": "2026-11-16T00:00:00.000Z",
+      "rank": 2,
+      "rankedAt": "2026-11-16T00:00:00.000Z"
+    },
+    {
+      "path": "/MUSICIANS/D/Daglish_Ben/Trap.sid",
+      "md5": "c43379003c52b8f76fbe729b991f41e7",
+      "at": "2026-11-16T00:00:00.000Z",
+      "rank": 3,
+      "rankedAt": "2026-11-16T00:00:00.000Z"
+    },
+    {
+      "path": "/A_Brown/Ripleys_Believe_it_or_not.mus",
+      "collection": "cgsc",
+      "md5": "",
+      "at": "2026-11-16T00:00:00.000Z",
+      "rank": 4,
+      "rankedAt": "2026-11-16T00:00:00.000Z"
+    },
+    {
+      "path": "/MUSICIANS/H/Hubbard_Rob/International_Karate.sid",
+      "md5": "f0cb46765db995d57d93d11ef600a04d",
+      "at": "2026-11-16T00:00:00.000Z",
+      "rank": 5,
+      "rankedAt": "2026-11-16T00:00:00.000Z"
+    },
+    {
+      "path": "/MUSICIANS/D/Daglish_Ben/Last_Ninja.sid",
+      "md5": "4e43a3a1d7cbf8755fa284bee4a47b00",
+      "at": "2026-11-16T00:00:00.000Z",
+      "rank": 6,
+      "rankedAt": "2026-11-16T00:00:00.000Z"
+    },
+    {
+      "path": "/MUSICIANS/H/Hubbard_Rob/Monty_on_the_Run.sid",
+      "md5": "793f0300acaca2f4c6ba23910f65c2e6",
+      "at": "2026-11-16T00:00:00.000Z",
+      "rank": 7,
+      "rankedAt": "2026-11-16T00:00:00.000Z"
+    },
+    {
+      "path": "/MUSICIANS/F/Feil_Georg/Synth_Sample.sid",
+      "md5": "37e80f4ae3ea16dc59a0a4afc52d2ea5",
+      "at": "2026-11-16T00:00:00.000Z",
+      "rank": 8,
+      "rankedAt": "2026-11-16T00:00:00.000Z"
+    },
+    {
+      "path": "/MUSICIANS/G/Galway_Martin/Wizball.sid",
+      "md5": "4522f889d5c41b3e08a00873a9e4b63a",
+      "at": "2026-11-16T00:00:00.000Z",
+      "rank": 9,
+      "rankedAt": "2026-11-16T00:00:00.000Z"
+    }
+  ],
+  "removed": []
+}

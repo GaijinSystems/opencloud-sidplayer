@@ -48,7 +48,7 @@ function onClick(event: MouseEvent): void {
 <template>
   <div class="demo" @focusin.capture="onFocus" @click.capture="onClick">
     <header class="demo-bar">
-      <span class="demo-title">SID Player for OpenCloud</span>
+      <span class="demo-title">OpenCloud SID Player</span>
       <span class="demo-pill">Demo</span>
       <span class="demo-note">Ten tunes, played in your browser. Favourites and settings stay in this browser; nothing is uploaded.</span>
       <a class="demo-link" href="https://github.com/GaijinSystems/opencloud-sidplayer">Get the app</a>
