@@ -165,6 +165,13 @@ fi
 # Anything that should never ship, whatever ends up in dist.
 find "$STAGE" \( -name '.DS_Store' -o -name '*.map' -o -name 'Thumbs.db' \) -delete
 
+# One mode for every file and one for every folder. Nothing in the app is
+# executable, and a file's mode otherwise depends on how it arrived: the wasm
+# is 0755 straight from the linker and 0644 as a downloaded CI artifact, so the
+# same commit packaged two different tarballs.
+find "$STAGE" -type f -exec chmod 0644 {} +
+find "$STAGE" -type d -exec chmod 0755 {} +
+
 # --- tar ---------------------------------------------------------------------
 # release/ holds this release's files and nothing else, so it starts empty.
 rm -rf "$OUT"
@@ -173,12 +180,9 @@ mkdir -p "$OUT"
 # The same bytes from the same commit: sorted, no owner names, the commit's
 # time on every entry, one set of modes, gzip without its own timestamp.
 #
-# --mode is not decoration. The staged tree inherits whatever modes the build
-# left behind - a mix of 0644 and 0664 depending on the builder's umask, and
-# 0755 on anything that arrived executable, such as the linked wasm - so two
-# builds of identical bytes produced different archives. u+rwX,go+rX,go-w
-# normalises them to 0644 for files and 0755 for directories whatever the umask
-# was.
+# The modes were set above; --mode only restates them, so that tar alone would
+# not put a builder's umask into the archive. (Its X keeps an executable file
+# executable, which is why the chmod comes first.)
 say "writing ${TARBALL##*/}"
 tar --sort=name \
   --owner=0 --group=0 --numeric-owner \
