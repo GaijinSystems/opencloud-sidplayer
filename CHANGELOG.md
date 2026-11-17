@@ -39,9 +39,9 @@ unaffected and stays a whole one.
   Update every install that serves the same users at once: an old copy goes on
   writing to `.sidplay/` once `.sidplayer/` exists, where nothing reads it.
 - **Update your proxy route.** The `/hvsc-mirror/` rules in
-  `deploy/haproxy-hvsc.cfg` have changed in both halves. Replace the frontend
-  lines and the `be_hvsc_mirror` backend with the new ones, then reload
-  HAProxy. The route now:
+  `haproxy-hvsc.cfg` (`deploy/` in the repository) have changed in both
+  halves. Replace the frontend lines and the `be_hvsc_mirror` backend with the
+  new ones, then reload HAProxy. The route now:
   - normalises only its own paths, rather than every request on the frontend;
   - admits only the characters the app sends, and refuses encoded dots,
     slashes, backslashes, percents and NULs, and any query string;

@@ -1,32 +1,34 @@
 # Installing OpenCloud SID Player
 
-The release tarball is the built app. There is nothing to compile.
+The release tarball is the built app. There is nothing to compile. Each
+[release](https://github.com/GaijinSystems/opencloud-sidplayer/releases) has
+these files, each with a `.sha256` beside it:
 
 ```
-release/opencloud-sidplayer-<version>.tar.gz          the app
-release/opencloud-sidplayer-<version>.tar.gz.sha256   checks the tarball and the two files below, from release/
-release/opencloud-sidplayer-<version>.SHA256SUMS      checks an installed copy, from $WEB_ASSET_APPS_PATH
-release/deploy/csp.yaml                               required, step 2
-release/deploy/haproxy-hvsc.cfg                       only for the library, step 4
+opencloud-sidplayer-<version>.tar.gz          the app
+opencloud-sidplayer-<version>.SHA256SUMS      checks an installed copy, from $WEB_ASSET_APPS_PATH
+csp.yaml                                      required, step 2
+haproxy-hvsc.cfg                              only for the library, step 4
 ```
 
 **Nothing has to be configured to enable the app.** The web service composes
 its list of apps from the folder itself, so unpacking and restarting is the
 whole installation — verified with no `apps.yaml` present at all: the app
-appears and runs on the defaults in its own manifest. The two files under
-`deploy/` are not about enabling it; one is a policy fragment the emulator
-needs, the other is optional and only for the library. They sit beside the
+appears and runs on the defaults in its own manifest. `csp.yaml` and
+`haproxy-hvsc.cfg` are not about enabling it; one is a policy fragment the
+emulator needs, the other is optional and only for the library. They sit beside the
 tarball rather than inside it because everything inside the app folder is
 served to browsers, and those two are for the server.
 
-Build one with `scripts/package.sh`; see [Building a tarball](#building-a-tarball)
-at the end.
+Or build them with `scripts/package.sh`, which puts the same files in
+`release/` (without the `.sha256` files); see
+[Building a tarball](#building-a-tarball) at the end.
 
 ## 1. Check and unpack
 
 ```
-cd release
-sha256sum -c opencloud-sidplayer-<version>.tar.gz.sha256
+cd /path/to/the/downloaded/files
+sha256sum -c ./*.sha256
 
 tar -xzf opencloud-sidplayer-<version>.tar.gz -C "$WEB_ASSET_APPS_PATH"
 ```
@@ -43,8 +45,8 @@ The app never writes to its own folder — a read-only mount is fine, and is how
 the packaged build is tested.
 
 To verify an installed copy later — note this one runs in the apps folder,
-because its paths start at `sidplayer/`, while the `.tar.gz.sha256` above runs
-in `release/`:
+because its paths start at `sidplayer/`, while the `.sha256` files above run
+where they were downloaded:
 
 ```
 cd "$WEB_ASSET_APPS_PATH" && sha256sum -c /path/to/opencloud-sidplayer-<version>.SHA256SUMS
@@ -58,7 +60,7 @@ the application menu.
 
 The emulator is WebAssembly, so `script-src` needs `'wasm-unsafe-eval'`.
 This comes from OpenCloud's own **proxy service**, not from your reverse
-proxy, and `deploy/csp.yaml` holds only that one directive because the file
+proxy, and `csp.yaml` (`deploy/` in the repository) holds only that one directive because the file
 is deep-merged with the built-in default — everything your identity provider
 and other apps rely on stays as it is.
 
@@ -112,7 +114,7 @@ whatever proxy already sits in front of OpenCloud, because the browser cannot
 reach HVSC directly: HVSC's version API answers 403 to any request carrying an
 `Origin` header, and no mirror sends CORS headers.
 
-`deploy/haproxy-hvsc.cfg` is the configuration: a few lines for the frontend
+`haproxy-hvsc.cfg` (`deploy/` in the repository) is the configuration: a few lines for the frontend
 you already have, and one new backend. **Copy them from that file rather than
 retyping them from here.** An earlier copy of them in this guide drifted from
 the file and was missing every one of the protections below, so this guide no
@@ -289,3 +291,26 @@ access to fetch libsidplayfp, and the result must match the sha256 recorded in
 The ROMs are included by default, as they are in the repository and the
 published release; `--no-roms` builds a tarball without them, named
 `opencloud-sidplayer-<version>-no-roms.tar.gz`.
+
+The files land in `release/`, which is emptied first. A build of a clean
+checkout is reproducible: the manifest's `builtAt` and every time in the
+tarball are the commit's, so packaging the same commit twice, with the same
+gzip, gives the same bytes.
+
+## Releasing
+
+Releases are made by `.github/workflows/release.yml`. Every push to `main` is
+checked, tested and built; a version tag also publishes the release, with
+`CHANGELOG.md`'s section for that version as its notes, and rebuilds the demo
+site. To release:
+
+1. Set the version in `source/package.json` and `source/package-lock.json`
+   and in the file names in README.md's Install section, and add a
+   `## <version>` section to `CHANGELOG.md`, in one commit.
+   `sh scripts/release-notes.sh` checks the two package files and the
+   CHANGELOG section, and prints the notes; the README is up to you.
+2. Push `main` and wait for its run to pass.
+3. `git tag v<version> && git push origin v<version>`.
+
+Release tags cannot be moved or deleted, so a fix after tagging is a new
+version.

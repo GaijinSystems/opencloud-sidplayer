@@ -154,15 +154,16 @@ build that changes the JavaScript, not just the first.
 
 ## Install
 
-`scripts/package.sh` builds a tarball whose single top-level directory is
-`sidplayer/`, so it extracts straight into the apps folder:
+Each [release](https://github.com/GaijinSystems/opencloud-sidplayer/releases)
+carries a tarball whose single top-level directory is `sidplayer/`, so it
+extracts straight into the apps folder:
 
 ```
-scripts/package.sh
-cd release
 sha256sum -c opencloud-sidplayer-1.2.0.tar.gz.sha256
 tar -xzf opencloud-sidplayer-1.2.0.tar.gz -C "$WEB_ASSET_APPS_PATH"
 ```
+
+`scripts/package.sh` builds the same tarball into `release/`.
 
 `WEB_ASSET_APPS_PATH` defaults to `$OC_BASE_DATA_PATH/web/assets/apps`; under
 opencloud-compose the host path is `config/opencloud/apps/`, not the data dir,

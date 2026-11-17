@@ -103,14 +103,31 @@ const commit = (() => {
     // engine files' `?v=`, and an edited worklet under a clean commit's stamp
     // would be passed over for the copy every browser already has cached.
     const dirty = git('status --porcelain -- . ../LICENSE') ? '-dirty' : ''
-    return git('rev-parse --short HEAD') + dirty
+    return git('rev-parse --short=12 HEAD') + dirty
   } catch {
     return 'unknown'
   }
 })()
 
 const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
-manifest.build = { commit, builtAt: new Date().toISOString() }
+// The commit's time, so that two builds of one commit are the same bytes. As with
+// the commit, SOURCE_DATE_EPOCH comes first (scripts/package.sh passes it into a
+// container that may have no git), then git, then the clock.
+const epoch = (() => {
+  if (/^\d+$/.test(process.env.SOURCE_DATE_EPOCH ?? '')) return Number(process.env.SOURCE_DATE_EPOCH)
+  try {
+    return (
+      Number(
+        execSync('git log -1 --format=%ct', { stdio: ['ignore', 'pipe', 'ignore'] })
+          .toString()
+          .trim()
+      ) || null
+    )
+  } catch {
+    return null
+  }
+})()
+manifest.build = { commit, builtAt: (epoch ? new Date(epoch * 1000) : new Date()).toISOString() }
 
 // Defaults shipped with the app, from the same file the app itself reads, so
 // the manifest cannot drift from the code. An administrator overrides these in

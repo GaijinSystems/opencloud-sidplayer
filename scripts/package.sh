@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 #
 # Packages the built app into a tarball that extracts straight into
-# OpenCloud's apps folder, with checksums beside it.
+# OpenCloud's apps folder, and puts the release files in release/: the
+# tarball, the list of what is inside it (<name>.SHA256SUMS), and the two
+# files for the server, csp.yaml and haproxy-hvsc.cfg. Nothing else; release/
+# is emptied first. The release workflow writes a <file>.sha256 beside each.
+#
+# The same commit packages to the same bytes: the build time recorded in the
+# manifest and every time in the tarball are the commit's.
 #
 #   scripts/package.sh                 build, then package with the ROMs
 #   scripts/package.sh --no-roms       package without them
@@ -67,18 +73,29 @@ for candidate in podman docker; do
   fi
 done
 
-COMMIT="$(git -C "$HERE" rev-parse --short HEAD 2>/dev/null || echo unknown)"
+# A fixed length: --short alone grows with the repository, and a shallow CI
+# checkout and a full clone would stamp the same commit differently.
+COMMIT="$(git -C "$HERE" rev-parse --short=12 HEAD 2>/dev/null || echo unknown)"
+# Under CI the commit is what is being released, so git has to answer: with no
+# commit, the clean check below would check nothing.
+[ "${CI:-}" != true ] || [ "$COMMIT" != unknown ] || die "git cannot read the commit; a CI build needs it"
+# The commit's time, for the manifest's builtAt and the tarball's mtimes, so
+# that a rebuild of the same commit is the same bytes.
+SOURCE_DATE_EPOCH="$(git -C "$HERE" log -1 --format=%ct 2>/dev/null || date +%s)"
 # Dirty if anything the build reads differs from the commit, new files
 # included: `git diff` alone misses an untracked file, and a build carrying
 # one would share its `?v=` stamp with the clean commit, so browsers would
 # keep the cached engine files. Only what the build reads counts.
 DIRTY=""
 if [ -n "$(git -C "$HERE" status --porcelain -- source LICENSE 2>/dev/null)" ]; then DIRTY="-dirty"; fi
+# A release is never built from anything but the commit.
+[ "${CI:-}" != true ] || [ -z "$DIRTY" ] || die "the checkout differs from ${COMMIT}; a CI build must be clean"
 
 # The image the build runs in, by digest: the tag moves with every Node 22
 # release, and a release build should be the same build whenever it is made.
 # This is the multi-architecture index, so it resolves on arm64 as on amd64.
 # Override with NODE_IMAGE=... to build with something else on purpose.
+# The same digest is in .github/workflows/release.yml and gh-pages' _demo/build.sh.
 NODE_IMAGE="${NODE_IMAGE:-docker.io/library/node:22-bookworm@sha256:0e5f906573693feaa1e21057ebdcfdb5bd5021f050b2dc7c9deceb629c7da2a8}"
 
 # --- build -------------------------------------------------------------------
@@ -108,11 +125,11 @@ if [ "$BUILD" = "1" ]; then
     # No network: the build reads what is already in node_modules, and a
     # step that reached for anything else should fail, not fetch.
     "$RUNNER" run --rm --network=none "${AS_USER[@]}" -v "$HERE":/repo:z -w /repo/source \
-      -e "SOURCE_COMMIT=${COMMIT}${DIRTY}" \
+      -e "SOURCE_COMMIT=${COMMIT}${DIRTY}" -e "SOURCE_DATE_EPOCH=${SOURCE_DATE_EPOCH}" \
       "$NODE_IMAGE" npm run build >/dev/null
   elif command -v npm >/dev/null 2>&1; then
     say "building with the local npm (commit ${COMMIT}${DIRTY})"
-    (cd "$SOURCE" && SOURCE_COMMIT="${COMMIT}${DIRTY}" npm run build >/dev/null)
+    (cd "$SOURCE" && SOURCE_COMMIT="${COMMIT}${DIRTY}" SOURCE_DATE_EPOCH="$SOURCE_DATE_EPOCH" npm run build >/dev/null)
   else
     die "neither podman/docker nor npm found; build first and pass --skip-build"
   fi
@@ -148,13 +165,12 @@ fi
 find "$STAGE" \( -name '.DS_Store' -o -name '*.map' -o -name 'Thumbs.db' \) -delete
 
 # --- tar ---------------------------------------------------------------------
+# release/ holds this release's files and nothing else, so it starts empty.
+rm -rf "$OUT"
 mkdir -p "$OUT"
-STAMP="$(sed -n 's/.*"builtAt"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$DIST/manifest.json" | head -1)"
-[ -n "$STAMP" ] || STAMP="@0"
 
-# The same bytes from the same dist: sorted, no owner names, one timestamp,
-# one set of modes, gzip without its own. (Not the same bytes from the same
-# source: the build stamps the time it ran into the manifest.)
+# The same bytes from the same commit: sorted, no owner names, the commit's
+# time on every entry, one set of modes, gzip without its own timestamp.
 #
 # --mode is not decoration. The staged tree inherits whatever modes the build
 # left behind - a mix of 0644 and 0664 depending on the builder's umask, and
@@ -165,11 +181,11 @@ STAMP="$(sed -n 's/.*"builtAt"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$DIS
 say "writing ${TARBALL##*/}"
 tar --sort=name \
   --owner=0 --group=0 --numeric-owner \
-  --mtime="$STAMP" \
+  --mtime="@${SOURCE_DATE_EPOCH}" \
   --mode='u+rwX,go+rX,go-w' \
   --format=gnu \
-  -C "$STAGE" -cf - sidplayer |
-  gzip -9 -n >"$TARBALL"
+  -I 'gzip -9n' \
+  -C "$STAGE" -cf "$TARBALL" sidplayer
 
 # --- the files that do not belong inside the app folder ----------------------
 #
@@ -181,25 +197,17 @@ tar --sort=name \
 # operator already has. They travel beside the tarball rather than inside it,
 # because anything inside the app folder is served to browsers, and these are
 # for the server.
-mkdir -p "$OUT/deploy"
-cp "$HERE/deploy/csp.yaml" "$HERE/deploy/haproxy-hvsc.cfg" "$OUT/deploy/"
-say "beside it: deploy/csp.yaml (required) and deploy/haproxy-hvsc.cfg (library only)"
+cp "$HERE/deploy/csp.yaml" "$HERE/deploy/haproxy-hvsc.cfg" "$OUT/"
+say "beside it: csp.yaml (required) and haproxy-hvsc.cfg (library only)"
 
-# --- checksums ---------------------------------------------------------------
-# Two lists, because they are checked in two different directories and a
-# single one would report failures wherever it was run: the paths inside the
-# tarball do not exist until it is unpacked, and the deploy files never go
-# into the apps folder at all.
-#
-#   in release/                 sha256sum -c <name>.tar.gz.sha256
-#   in $WEB_ASSET_APPS_PATH     sha256sum -c <name>.SHA256SUMS
-(cd "$OUT" && sha256sum "${NAME}.tar.gz" deploy/csp.yaml deploy/haproxy-hvsc.cfg >"${NAME}.tar.gz.sha256")
+# --- what is inside ----------------------------------------------------------
+# Paths start at sidplayer/: check with `sha256sum -c <name>.SHA256SUMS` in the
+# apps folder.
 (cd "$STAGE" && find sidplayer -type f -print0 | sort -z | xargs -0 sha256sum) >"$OUT/${NAME}.SHA256SUMS"
 
 SIZE="$(du -h "$TARBALL" | cut -f1)"
 FILES="$(tar -tzf "$TARBALL" | grep -vc '/$' || true)"
 say "done: $SIZE, $FILES files, version $VERSION, commit ${COMMIT}${DIRTY}"
-say "verify:  sha256sum -c ${NAME}.tar.gz.sha256"
 say "install: tar -xzf ${NAME}.tar.gz -C \"\$WEB_ASSET_APPS_PATH\" && restart the web service"
 if command -v gpg >/dev/null 2>&1 && gpg --list-secret-keys >/dev/null 2>&1 &&
   [ -n "$(gpg --list-secret-keys 2>/dev/null)" ]; then
