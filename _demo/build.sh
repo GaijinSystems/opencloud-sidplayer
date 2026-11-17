@@ -10,7 +10,8 @@
 # `README.md`, `CNAME` and `.gitignore` stay; nothing else there is kept.
 set -euo pipefail
 
-HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+unset GIT_DIR GIT_WORK_TREE
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 ROOT="$(dirname "$HERE")"
 # Only ever at the root of a gh-pages checkout: everything here but the
 # source and the branch's own files is about to be deleted.
@@ -62,7 +63,7 @@ INSIDE="/site/_demo/$(basename "$WORK")"
 # (`.gitignore` is meant to be left out; it is the branch's, not the site's.)
 # Nor may a published file open with front matter, or Jekyll processes it.
 FRONT="$(find "$ROOT" -mindepth 1 \( -path "$ROOT/_demo" -o -path "$ROOT/.git" \) -prune -o -type f -print0 |
-  xargs -0 sh -c 'for f; do [ "$(head -c 3 "$f")" = "---" ] && echo "$f"; done; true' sh)"
+  xargs -0 sh -c 'for f; do head -n 1 "$f" | grep -qx -- "---[[:space:]]*" && echo "$f"; done; true' sh)"
 if [ -n "$FRONT" ]; then
   printf 'a published file opens with front matter:\n%s\n' "$FRONT" >&2
   exit 1

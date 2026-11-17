@@ -66,9 +66,10 @@ function existing(path: string): string {
 export function loadDemoSpace(): void {
   files = new Map((listing as Listed[]).map((entry) => [clean(entry.path), { ...entry, path: clean(entry.path) }]))
   for (const path of files.keys()) addFolders(path)
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i)
-    if (!key?.startsWith(STORE)) continue
+  // The keys are taken first: removing one while walking by index would shift
+  // the next into the slot just read, and it would be skipped.
+  for (const key of Object.keys(localStorage)) {
+    if (!key.startsWith(STORE)) continue
     const path = key.slice(STORE.length)
     const text = localStorage.getItem(key) ?? ''
     // A file this browser kept that no longer reads is let go of: a visitor
