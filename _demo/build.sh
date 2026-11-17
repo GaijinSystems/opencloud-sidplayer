@@ -12,6 +12,12 @@ set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(dirname "$HERE")"
+# Only ever at the root of a gh-pages checkout: everything here but the
+# source and the branch's own files is about to be deleted.
+[ "$(git -C "$ROOT" rev-parse --show-toplevel 2>/dev/null)" = "$ROOT" ] &&
+  [ "$(git -C "$ROOT" symbolic-ref --short HEAD 2>/dev/null)" = gh-pages ] ||
+  { echo "run this from a checkout of the gh-pages branch; $ROOT is not one" >&2; exit 1; }
+
 APP_REF="${APP_REF:-main}"
 DEMO_REF="${DEMO_REF:-demo}"
 NODE_IMAGE="${NODE_IMAGE:-docker.io/library/node:22-bookworm@sha256:0e5f906573693feaa1e21057ebdcfdb5bd5021f050b2dc7c9deceb629c7da2a8}"
@@ -30,7 +36,8 @@ REPO="$(git -C "$ROOT" rev-parse --show-toplevel)"
 git -C "$REPO" archive "$APP_REF" source LICENSE | tar -x -C "$WORK"
 git -C "$REPO" archive "$DEMO_REF" demo | tar -x -C "$WORK"
 
-# The previous build, and only that.
+# The previous build, and only that. (A build that then fails leaves the
+# branch without one; git checks the last one back out.)
 find "$ROOT" -mindepth 1 -maxdepth 1 \
   ! -name _demo ! -name README.md ! -name CNAME ! -name .gitignore ! -name .git \
   -exec rm -rf {} +
@@ -53,6 +60,13 @@ INSIDE="/site/_demo/$(basename "$WORK")"
 
 # Jekyll leaves out names that start with `_` or `.`; nothing the site needs may.
 # (`.gitignore` is meant to be left out; it is the branch's, not the site's.)
+# Nor may a published file open with front matter, or Jekyll processes it.
+FRONT="$(find "$ROOT" -mindepth 1 \( -path "$ROOT/_demo" -o -path "$ROOT/.git" \) -prune -o -type f -print0 |
+  xargs -0 sh -c 'for f; do [ "$(head -c 3 "$f")" = "---" ] && echo "$f"; done; true' sh)"
+if [ -n "$FRONT" ]; then
+  printf 'a published file opens with front matter:\n%s\n' "$FRONT" >&2
+  exit 1
+fi
 HIDDEN="$(find "$ROOT" -mindepth 1 \( -path "$ROOT/_demo" -o -path "$ROOT/.git" -o -path "$ROOT/.gitignore" \) -prune -o -name '[_.]*' -print)"
 if [ -n "$HIDDEN" ]; then
   printf 'the build has a file Jekyll would leave out:\n%s\n' "$HIDDEN" >&2

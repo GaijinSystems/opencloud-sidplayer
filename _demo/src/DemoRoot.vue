@@ -13,7 +13,7 @@ type Notice = { title: string; body: string }
 const NOTICES: Record<'search' | 'collection', Notice> = {
   search: {
     title: 'Search is not part of this demo',
-    body: 'In the app, search covers the whole High Voltage SID Collection - over 61,000 tunes, by title, composer, real name, year, chip and STIL commentary. That needs the collection in an OpenCloud space; this demo has ten tunes and no server.'
+    body: 'In the app, search covers the whole High Voltage SID Collection - over 61,000 tunes, by title, composer, real name, year, chip and STIL commentary. That needs an OpenCloud instance to fetch the collection’s documents, about 9 MB; this demo has ten tunes and no server.'
   },
   collection: {
     title: 'Not in this demo',
@@ -50,7 +50,7 @@ function onClick(event: MouseEvent): void {
     <header class="demo-bar">
       <span class="demo-title">SID Player for OpenCloud</span>
       <span class="demo-pill">Demo</span>
-      <span class="demo-note">Ten tunes, played in your browser. Nothing is uploaded or kept anywhere else.</span>
+      <span class="demo-note">Ten tunes, played in your browser. Favourites and settings stay in this browser; nothing is uploaded.</span>
       <a class="demo-link" href="https://github.com/GaijinSystems/opencloud-sidplayer">Get the app</a>
     </header>
     <main class="demo-main">

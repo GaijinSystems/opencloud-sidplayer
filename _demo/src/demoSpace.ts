@@ -32,6 +32,16 @@ export const demoSpace = {
   getDriveAliasAndItem: (resource: { path?: string }) => `personal/demo${resource.path ?? ''}`
 } as const
 
+const parses = (text: string): boolean => {
+  try {
+    JSON.parse(text)
+    return true
+  } catch {
+    return false
+  }
+}
+const sizeOf = (text: string): number => new TextEncoder().encode(text).length
+
 const clean = (path: string): string => ('/' + path).replace(/\/{2,}/g, '/').replace(/(.)\/+$/, '$1')
 
 let files = new Map<string, Listed>()
@@ -61,7 +71,13 @@ export function loadDemoSpace(): void {
     if (!key?.startsWith(STORE)) continue
     const path = key.slice(STORE.length)
     const text = localStorage.getItem(key) ?? ''
-    files.set(path, { path, text, size: text.length })
+    // A file this browser kept that no longer reads is let go of: a visitor
+    // has no space to go and mend it in.
+    if (path.endsWith('.json') && !parses(text)) {
+      localStorage.removeItem(key)
+      continue
+    }
+    files.set(path, { path, text, size: sizeOf(text) })
     addFolders(path)
   }
 }
@@ -130,9 +146,11 @@ export const demoWebdav = {
 
   async putFileContents(_space: unknown, { path, content }: { path: string; content: string | ArrayBuffer }) {
     const at = clean(path)
-    const text = typeof content === 'string' ? content : new TextDecoder().decode(content)
-    localStorage.setItem(STORE + at, text)
-    files.set(at, { path: at, text, size: text.length })
+    // Text only: the app writes its own JSON files here, and a tune fetched
+    // into the space would need a mirror the demo does not have.
+    if (typeof content !== 'string') throw Object.assign(new Error('403'), { statusCode: 403 })
+    localStorage.setItem(STORE + at, content)
+    files.set(at, { path: at, text: content, size: sizeOf(content) })
     addFolders(at)
   },
 
