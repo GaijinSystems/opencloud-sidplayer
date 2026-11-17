@@ -7,6 +7,9 @@
  * shapes the client gives - which is all the app ever sees of a server.
  */
 
+import { parentFolder } from '@app/sid/source'
+import listing from '../space-listing.json'
+
 interface Listed {
   /** Path in the space. */
   path: string
@@ -29,21 +32,29 @@ export const demoSpace = {
   getDriveAliasAndItem: (resource: { path?: string }) => `personal/demo${resource.path ?? ''}`
 } as const
 
+const clean = (path: string): string => ('/' + path).replace(/\/{2,}/g, '/').replace(/(.)\/+$/, '$1')
+
 let files = new Map<string, Listed>()
 const folders = new Set<string>(['/'])
 const fetched = new Map<string, Promise<Uint8Array>>()
 
-const parentOf = (path: string): string => path.slice(0, Math.max(0, path.lastIndexOf('/'))) || '/'
-const clean = (path: string): string => ('/' + path).replace(/\/{2,}/g, '/').replace(/(.)\/+$/, '$1')
-
 function addFolders(path: string): void {
-  for (let p = parentOf(path); !folders.has(p); p = parentOf(p)) folders.add(p)
+  for (let p = parentFolder(path); !folders.has(p); p = parentFolder(p)) folders.add(p)
 }
 
-/** Reads the build's list of files, and whatever this browser has written over them. */
-export async function loadDemoSpace(): Promise<void> {
-  const listing = (await (await fetch(new URL('space.json', document.baseURI))).json()) as Listed[]
-  files = new Map(listing.map((entry) => [clean(entry.path), { ...entry, path: clean(entry.path) }]))
+/** The path as the space knows it, or the 404 a server would give for one it does not. */
+function existing(path: string): string {
+  const at = clean(path)
+  if (!folders.has(at) && !files.has(at)) throw notThere()
+  return at
+}
+
+/**
+ * The build's list of files, built into the page rather than fetched beside
+ * it, and whatever this browser has written over them.
+ */
+export function loadDemoSpace(): void {
+  files = new Map((listing as Listed[]).map((entry) => [clean(entry.path), { ...entry, path: clean(entry.path) }]))
   for (const path of files.keys()) addFolders(path)
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i)
@@ -91,21 +102,18 @@ function resourceFor(path: string) {
 /** The calls the app makes on OpenCloud's WebDAV client. */
 export const demoWebdav = {
   async listFiles(_space: unknown, { path = '/' }: { path?: string }, options: { depth?: number } = {}) {
-    const at = clean(path)
-    if (!folders.has(at) && !files.has(at)) throw notThere()
+    const at = existing(path)
     const resource = resourceFor(at)
     if (options.depth === 0 || !folders.has(at)) return { resource, children: [] }
     const children = [...new Set([...folders, ...files.keys()])]
-      .filter((p) => p !== at && parentOf(p) === at)
+      .filter((p) => p !== at && parentFolder(p) === at)
       .sort()
       .map(resourceFor)
     return { resource, children }
   },
 
   async getFileInfo(_space: unknown, { path = '/' }: { path?: string }) {
-    const at = clean(path)
-    if (!folders.has(at) && !files.has(at)) throw notThere()
-    return resourceFor(at)
+    return resourceFor(existing(path))
   },
 
   async getFileContents(

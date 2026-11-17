@@ -36,7 +36,8 @@ function onFocus(event: FocusEvent): void {
 function onClick(event: MouseEvent): void {
   const button = (event.target as HTMLElement | null)?.closest('button, a')
   const label = (button?.textContent ?? '').trim()
-  if (/^(Download all|Update|Index all tunes|Download release|Start online|Try again)/.test(label)) {
+  // Whole labels, so a reworded one is let through rather than another caught.
+  if (/^(Download all…|Update…|Index all tunes|Download release \d*|Start online)$/.test(label)) {
     event.preventDefault()
     event.stopPropagation()
     notice.value = NOTICES.collection

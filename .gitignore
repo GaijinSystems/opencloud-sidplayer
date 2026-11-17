@@ -1,3 +1,4 @@
 _demo/generated/
 _demo/node_modules
 _demo/.work.*
+_demo/space-listing.json

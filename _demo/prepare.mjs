@@ -11,7 +11,7 @@
 import { createHash } from 'node:crypto'
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const app = process.env.APP_SOURCE
@@ -21,13 +21,18 @@ const out = join(here, 'generated')
 rmSync(out, { recursive: true, force: true })
 mkdirSync(out, { recursive: true })
 
-/* The engine, as the app's own build keeps it: what engine.json names, and the processor and adapter. */
+/** Writes a file of the site, making its folder. */
+function put(served, bytes) {
+  mkdirSync(dirname(join(out, served)), { recursive: true })
+  writeFileSync(join(out, served), bytes)
+}
+
+/* The engine, exactly as the app's own build keeps it. */
+const { engineFiles } = await import(pathToFileURL(join(app, 'scripts/engine-files.mjs')).href)
 const engineFrom = join(app, 'public/vendor/sid-engine')
-const engineTo = join(out, 'vendor/sid-engine')
-mkdirSync(engineTo, { recursive: true })
 const manifest = JSON.parse(readFileSync(join(engineFrom, 'engine.json'), 'utf8'))
-for (const name of ['sid-processor.js', 'engine.js', 'engine.json', 'LICENSE-libsidplayfp.txt', ...manifest.files, ...(manifest.optional ?? [])]) {
-  if (existsSync(join(engineFrom, name))) cpSync(join(engineFrom, name), join(engineTo, name))
+for (const name of engineFiles(manifest)) {
+  if (existsSync(join(engineFrom, name))) put(`vendor/sid-engine/${name}`, readFileSync(join(engineFrom, name)))
 }
 
 /* The icons the app and its components draw, in both of the forms they are asked for. */
@@ -43,12 +48,14 @@ for (const icon of ICONS) {
 
 /* The space: the demo's tunes, HVSC's documents for them, and the app's own two files. */
 const RELEASE = 'Release 85'
-const hvscTxt = `High Voltage SID Collection\n\n                                  ${RELEASE}\n\nThe demo's copy says only which release its tunes are from.\n`
+const hvscTxt = Buffer.from(
+  `High Voltage SID Collection\n\n                                  ${RELEASE}\n\nThe demo's copy says only which release its tunes are from.\n`,
+  'latin1'
+)
 const listing = []
 const md5 = (bytes) => createHash('md5').update(bytes).digest('hex')
 function addFile(spacePath, bytes, servedAs) {
-  mkdirSync(dirname(join(out, servedAs)), { recursive: true })
-  writeFileSync(join(out, servedAs), bytes)
+  put(servedAs, bytes)
   listing.push({ path: spacePath, url: servedAs, size: bytes.length, md5: md5(bytes) })
 }
 function walk(dir) {
@@ -58,7 +65,7 @@ function walk(dir) {
   })
 }
 for (const file of walk(library)) {
-  const rel = relative(library, file).split('\\').join('/')
+  const rel = relative(library, file)
   const bytes = readFileSync(file)
   if (rel.startsWith('.sidplayer/')) {
     // Text, given inline: a folder called `.sidplayer` would not survive Jekyll.
@@ -70,12 +77,12 @@ for (const file of walk(library)) {
 for (const name of ['Songlengths.md5', 'STIL.txt', 'Musicians.txt']) {
   addFile(`/SID Library/C64Music/DOCUMENTS/${name}`, readFileSync(join(here, 'data', name)), `space/C64Music/DOCUMENTS/${name}`)
 }
-addFile('/SID Library/C64Music/DOCUMENTS/HVSC.txt', Buffer.from(hvscTxt, 'latin1'), 'space/C64Music/DOCUMENTS/HVSC.txt')
-writeFileSync(join(out, 'space.json'), JSON.stringify(listing, null, 1))
+addFile('/SID Library/C64Music/DOCUMENTS/HVSC.txt', hvscTxt, 'space/C64Music/DOCUMENTS/HVSC.txt')
+// Beside the source rather than in the site: the page has it built in.
+writeFileSync(join(here, 'space-listing.json'), JSON.stringify(listing, null, 1))
 
 /* The mirror route, for the release check alone. */
-mkdirSync(join(out, 'hvsc-mirror/C64Music/DOCUMENTS'), { recursive: true })
-writeFileSync(join(out, 'hvsc-mirror/C64Music/DOCUMENTS/HVSC.txt'), hvscTxt)
+put('hvsc-mirror/C64Music/DOCUMENTS/HVSC.txt', hvscTxt)
 
 /* What the site is made of, and under which licences. */
 cpSync(join(app, '../LICENSE'), join(out, 'LICENSE'))

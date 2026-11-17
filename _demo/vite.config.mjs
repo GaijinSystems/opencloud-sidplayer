@@ -6,10 +6,12 @@ import { readFileSync } from 'node:fs'
 
 const here = fileURLToPath(new URL('.', import.meta.url))
 const app = process.env.APP_SOURCE
-if (!app) throw new Error('set APP_SOURCE to the app source/ folder')
+const out = process.env.OUT
+if (!app || !out) throw new Error('set APP_SOURCE to the app source/ folder and OUT to where the site goes')
 
 /** Jekyll leaves out names that start with `_` or `.`, so none may. */
 const plain = (name) => name.replace(/^[_.]+/, '')
+const script = (chunk) => `js/${plain(chunk.name)}-[hash].js`
 
 export default defineConfig({
   root: here,
@@ -28,14 +30,13 @@ export default defineConfig({
     dedupe: ['vue']
   },
   build: {
-    outDir: process.env.OUT ?? resolve(here, '../site'),
+    outDir: out,
     emptyOutDir: false,
     target: 'es2022',
-    assetsDir: 'assets',
     rollupOptions: {
       output: {
-        entryFileNames: (c) => `js/${plain(c.name)}-[hash].js`,
-        chunkFileNames: (c) => `js/${plain(c.name)}-[hash].js`,
+        entryFileNames: script,
+        chunkFileNames: script,
         assetFileNames: (a) => `assets/${plain(a.names?.[0]?.replace(/\.[^.]+$/, '') ?? 'asset')}-[hash][extname]`
       }
     }

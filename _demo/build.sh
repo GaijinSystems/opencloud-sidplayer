@@ -35,13 +35,16 @@ find "$ROOT" -mindepth 1 -maxdepth 1 \
   ! -name _demo ! -name README.md ! -name CNAME ! -name .gitignore ! -name .git \
   -exec rm -rf {} +
 
+INSIDE="/site/_demo/$(basename "$WORK")"
+# npm's cache in a volume of its own, so a rebuild does not fetch every package again.
 "$RUNNER" run --rm "${AS_USER[@]}" -v "$ROOT":/site:z -w /site/_demo \
-  -e APP_SOURCE="/site/_demo/$(basename "$WORK")/source" \
-  -e DEMO_LIBRARY="/site/_demo/$(basename "$WORK")/demo/SID Library" \
+  -v sidplayer-demo-npm:/npm-cache -e npm_config_cache=/npm-cache \
+  -e APP_SOURCE="$INSIDE/source" \
+  -e DEMO_LIBRARY="$INSIDE/demo/SID Library" \
   -e OUT=/site \
   "$NODE_IMAGE" sh -c '
     set -e
-    (cd "$APP_SOURCE" && npm ci --no-audit --no-fund --legacy-peer-deps >/dev/null)
+    (cd "$APP_SOURCE" && npm ci --prefer-offline --no-audit --no-fund --legacy-peer-deps >/dev/null)
     ln -sfn "$APP_SOURCE/node_modules" node_modules
     node prepare.mjs
     node "$APP_SOURCE/node_modules/vite/bin/vite.js" build
@@ -50,10 +53,9 @@ find "$ROOT" -mindepth 1 -maxdepth 1 \
 
 # Jekyll leaves out names that start with `_` or `.`; nothing the site needs may.
 # (`.gitignore` is meant to be left out; it is the branch's, not the site's.)
-OUTSIDE=(-mindepth 1 \( -path "$ROOT/_demo" -o -path "$ROOT/.git" -o -path "$ROOT/.gitignore" \) -prune -o -name '[_.]*' -print)
-if find "$ROOT" "${OUTSIDE[@]}" | grep -q .; then
-  echo "the build has a file Jekyll would leave out:" >&2
-  find "$ROOT" "${OUTSIDE[@]}" >&2
+HIDDEN="$(find "$ROOT" -mindepth 1 \( -path "$ROOT/_demo" -o -path "$ROOT/.git" -o -path "$ROOT/.gitignore" \) -prune -o -name '[_.]*' -print)"
+if [ -n "$HIDDEN" ]; then
+  printf 'the build has a file Jekyll would leave out:\n%s\n' "$HIDDEN" >&2
   exit 1
 fi
 echo "built into $ROOT"

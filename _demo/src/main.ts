@@ -18,35 +18,29 @@ import DemoRoot from './DemoRoot.vue'
 
 declare const __APP_VERSION__: string
 
-const here = new URL('./', document.baseURI).href
-
-/*
- * The mirror route, for the one thing the library asks of it here: which
- * release is current. The answer is a file beside the page; anything else
- * is not, and fails as a mirror that does not have it.
- */
-const realFetch = window.fetch.bind(window)
-window.fetch = (input: RequestInfo | URL, init?: RequestInit) => {
-  const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
-  const path = url.startsWith(location.origin) ? url.slice(location.origin.length) : url
-  if (path.startsWith('/hvsc-mirror/')) return realFetch(new URL(path.slice(1), here), init)
-  return realFetch(input, init)
-}
+const here = new URL('./', document.baseURI)
 
 // What the shell does for every app: its theme on the page, and its icons.
 const dark = matchMedia('(prefers-color-scheme: dark)')
-const shellTheme = () => applyThemeTo(document.documentElement, pickTheme(themes, dark.matches ? 'dark' : 'light') ?? null)
-let applied = shellTheme()
-dark.addEventListener('change', () => {
+let applied: string[] = []
+const shellTheme = (): void => {
   applied = applyThemeTo(document.documentElement, pickTheme(themes, dark.matches ? 'dark' : 'light') ?? null, applied)
+}
+shellTheme()
+dark.addEventListener('change', shellTheme)
+setIconUrlPrefix(here.href)
+setAssetBaseUrl(here.href)
+
+loadDemoSpace()
+
+const config = readConfig({
+  // The version the library shows under its name, as the app's own build stamps it.
+  version: __APP_VERSION__,
+  // The mirror route, for the one thing the library asks of it here - which
+  // release is current - answered by a file beside the page, wherever the
+  // page is served from.
+  hvscMirrorPath: new URL('hvsc-mirror', here).pathname
 })
-setIconUrlPrefix(here)
-setAssetBaseUrl(here)
-
-await loadDemoSpace()
-
-// The version the library shows under its name, as the app's own build stamps it.
-const config = readConfig({ version: __APP_VERSION__ })
 initSession(config, { webdav: demoWebdav as never, themes: () => themes })
 
 createApp(DemoRoot)
