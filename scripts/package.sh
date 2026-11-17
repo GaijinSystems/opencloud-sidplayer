@@ -118,13 +118,14 @@ if [ "$BUILD" = "1" ]; then
     if [ "$RUNNER" = "podman" ]; then
       AS_USER=(--userns=keep-id)
     else
-      # A user the image has never heard of has `/` for a home, which npm
-      # cannot write its cache or logs to.
-      AS_USER=(--user "$(id -u):$(id -g)" -e HOME=/tmp)
+      AS_USER=(--user "$(id -u):$(id -g)")
     fi
+    # HOME=/tmp: the user may have no home of its own in the image - docker's
+    # gets `/`, which npm cannot write to, and on a CI runner podman's was the
+    # working directory, so npm wrote its cache and logs into source/.
     # No network: the build reads what is already in node_modules, and a
     # step that reached for anything else should fail, not fetch.
-    "$RUNNER" run --rm --network=none "${AS_USER[@]}" -v "$HERE":/repo:z -w /repo/source \
+    "$RUNNER" run --rm --network=none "${AS_USER[@]}" -e HOME=/tmp -v "$HERE":/repo:z -w /repo/source \
       -e "SOURCE_COMMIT=${COMMIT}${DIRTY}" -e "SOURCE_DATE_EPOCH=${SOURCE_DATE_EPOCH}" \
       "$NODE_IMAGE" npm run build >/dev/null
   elif command -v npm >/dev/null 2>&1; then
