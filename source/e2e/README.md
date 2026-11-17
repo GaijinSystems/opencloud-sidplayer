@@ -23,10 +23,11 @@ This is a build to test, from `source/` alone; it warns that it cannot find
 `LICENSE`. A build to install comes from `scripts/package.sh`, which mounts
 the whole repository so the app carries its licence.
 
-(`engine/build.sh` must have produced `public/vendor/sid-engine/libsidplayfp.wasm`
-first; see `engine/README.md`. It runs the same way inside
-`docker.io/emscripten/emsdk:3.1.74`, which is the version `EMSDK_VERSION` in
-`build.sh` pins and the build refuses to differ from without being told.)
+(`engine/build-in-container.sh` must have produced
+`public/vendor/sid-engine/libsidplayfp.wasm` first, which is not in git; see
+`engine/README.md`. It runs `build.sh` inside `docker.io/emscripten/emsdk:3.1.74`,
+the version `EMSDK_VERSION` in `build.sh` pins and the build refuses to differ
+from without being told.)
 
 Two things about the built app that are easy to meet for the first time here:
 

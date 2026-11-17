@@ -35,7 +35,8 @@ file. `optional` ones are fetched if present and skipped otherwise. Names
 must be bare file names in the same directory. No `engine.json` at all means
 an engine that needs nothing.
 
-`build` is not read at runtime. `source/engine/build.sh` writes it and
+`build` is not read at runtime. `source/engine/build.sh` writes it, refuses a
+build that does not reproduce a hash already recorded there, and
 `scripts/prune-dist.mjs` checks `wasmSha256` against the binary in `dist/`,
 failing the build on a mismatch, so a stale or foreign wasm stops looking
 exactly like the right one. `prune-dist.mjs` also deletes anything in

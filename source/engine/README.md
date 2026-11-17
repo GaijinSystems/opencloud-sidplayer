@@ -6,9 +6,14 @@ WebAssembly module with WASI imports and no JavaScript glue, which is what
 `engine.js` expects.
 
 ```
+./build-in-container.sh              # in the pinned emsdk image; needs podman or docker
+# or, with emsdk 3.1.74 on PATH:
 source /path/to/emsdk/emsdk_env.sh
 ./build.sh
 ```
+
+The wasm is not tracked in git. `engine.json` is, and records the sha256 the
+build must reproduce; see below.
 
 Then `npm run build` in `source/` so `dist/` picks up the binary.
 
@@ -74,8 +79,13 @@ version that actually built the binary is what gets written down.
 `build.sh` then writes `libsidplayfp`, `emsdk` and `wasmSha256` into
 `public/vendor/sid-engine/engine.json`, beside the `files` and `optional` lists
 the app already reads. `scripts/prune-dist.mjs` checks that hash against the
-binary in `dist/` and fails the build on a mismatch. Commit the engine.json
-with the wasm; they are one artefact.
+binary in `dist/` and fails the build on a mismatch.
+
+The build is reproducible: the same sources, flags and pinned image give the
+same bytes. So when `engine.json` already records a hash, `build.sh` refuses a
+binary that differs, rather than rewriting the record to match it. A
+deliberate change is built with `REPIN=1`, and the `engine.json` it writes is
+committed; that file is the only part of the engine that is.
 
 `patches/` is fingerprinted too: the extracted source under `build/` carries a
 hash of the patch files and the compile flags, and a change to either forces a
@@ -83,12 +93,11 @@ fresh extract. Editing a patch no longer needs `CLEAN=1`.
 
 ## Changing shim.cpp
 
-`shim.cpp` is source for a binary that is committed. Editing it changes nothing
-that runs until someone with an Emscripten toolchain runs `build.sh` and
-commits the new `libsidplayfp.wasm` **and** the `engine.json` beside it. There
-is no build step in the app's own `npm run build` that would catch the
-difference: `prune-dist.mjs` verifies that the wasm matches its recorded hash,
-not that the hash matches the C++.
+Editing `shim.cpp`, a patch or a pinned version changes the bytes, so the next
+build stops on the hash. Build with `REPIN=1` and commit the new `engine.json`
+with the change; everyone who builds after that gets the same binary. The
+pinned hash says which bytes to expect, not that they match the C++: only
+`npm run verify:engine` and the browser tests check what the engine does.
 
 ## Licence
 

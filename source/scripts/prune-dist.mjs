@@ -59,8 +59,8 @@ if (engineMissing.length) {
  * shipping a binary nobody can account for.
  *
  * An engine.json without the block is a binary built before this existed: say
- * so rather than fail, because the wasm is tracked in git and a checkout is
- * entitled to build.
+ * so rather than fail. engine/build.sh now also refuses to produce a binary
+ * that differs from a recorded hash, so this check is the second of two.
  */
 const wasmPath = join(dist, 'vendor/sid-engine/libsidplayfp.wasm')
 const stamp = engineManifest.build

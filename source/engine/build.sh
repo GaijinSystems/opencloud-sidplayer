@@ -4,7 +4,8 @@
 #
 # Needs the Emscripten SDK on PATH (`source /path/to/emsdk/emsdk_env.sh`),
 # plus curl, tar and make. Everything else is downloaded into ./build and
-# can be deleted afterwards.
+# can be deleted afterwards. Or run ./build-in-container.sh, which runs this
+# inside the pinned Emscripten image and needs only podman or docker.
 #
 # The result is a standalone WebAssembly module: no JavaScript glue, WASI
 # imports only, exceptions handled in-module. That is what lets engine.js
@@ -15,6 +16,8 @@
 #   ./build.sh            build with the pinned libsidplayfp version
 #   CLEAN=1 ./build.sh    wipe ./build first
 #   JOBS=8 ./build.sh     parallel make
+#   REPIN=1 ./build.sh    record a new wasmSha256 in engine.json after a
+#                         deliberate change (see below)
 #
 # Editing a patch no longer needs CLEAN=1: the extracted source carries a
 # fingerprint of patches/ and the compile flags, and a change to either forces
@@ -205,10 +208,25 @@ cp "$SRC/COPYING" "$OUT/LICENSE-libsidplayfp.txt"
 # "the file exists" was the whole of the verification. scripts/prune-dist.mjs
 # checks wasmSha256 against dist/ and fails the build on a mismatch.
 #
-# No timestamp here on purpose: the file is tracked in git and a build stamp
-# would make it differ on every rebuild of identical bytes. The hash is the
-# identity; manifest.json carries the time and the commit.
+# The wasm itself is not in git; engine.json is, and its hash is the pin. The
+# build is reproducible (same sources, same flags, same pinned emsdk image, same
+# bytes), so a build that comes out different is refused rather than recorded:
+# it would otherwise rewrite the pin to match and pass every later check. After
+# a deliberate change - shim.cpp, a patch, a version - build with REPIN=1 and
+# commit the engine.json it writes.
+#
+# No timestamp here on purpose: a build stamp would make the tracked file
+# differ on every rebuild of identical bytes. The hash is the identity;
+# manifest.json carries the time and the commit.
 WASM_SHA256="$(sha256sum "$OUT/libsidplayfp.wasm" | cut -d' ' -f1)"
+PINNED="$(sed -n 's/.*"wasmSha256"[[:space:]]*:[[:space:]]*"\([0-9a-f]*\)".*/\1/p' "$OUT/engine.json" 2>/dev/null || true)"
+if [ -n "$PINNED" ] && [ "$PINNED" != "$WASM_SHA256" ] && [ "${REPIN:-0}" != "1" ]; then
+  rm -f "$OUT/libsidplayfp.wasm"
+  die "built sha256 ${WASM_SHA256}, but engine.json pins ${PINNED}.
+       Same sources should give the same bytes, so something differs: the toolchain,
+       the sources or the flags. After a deliberate change, build with REPIN=1 and
+       commit the engine.json it writes."
+fi
 cat >"$OUT/engine.json" <<JSON
 {
   "name": "libsidplayfp",

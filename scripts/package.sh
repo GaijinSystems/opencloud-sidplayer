@@ -82,6 +82,13 @@ if [ -n "$(git -C "$HERE" status --porcelain -- source LICENSE 2>/dev/null)" ]; 
 NODE_IMAGE="${NODE_IMAGE:-docker.io/library/node:22-bookworm@sha256:0e5f906573693feaa1e21057ebdcfdb5bd5021f050b2dc7c9deceb629c7da2a8}"
 
 # --- build -------------------------------------------------------------------
+# The emulator is not in git, only its hash (in engine.json), so a fresh
+# checkout builds it first. engine/build.sh refuses a binary that does not
+# match that hash, so this is the same engine whoever packages it.
+if [ "$BUILD" = "1" ] && [ ! -f "$SOURCE/public/vendor/sid-engine/libsidplayfp.wasm" ]; then
+  say "building the emulator in the pinned Emscripten image"
+  "$SOURCE/engine/build-in-container.sh" >/dev/null
+fi
 if [ "$BUILD" = "1" ]; then
   if [ -n "$RUNNER" ]; then
     say "building in a container (commit ${COMMIT}${DIRTY})"
@@ -113,7 +120,7 @@ fi
 
 [ -f "$DIST/manifest.json" ] || die "no build at $DIST; run without --skip-build"
 [ -f "$DIST/vendor/sid-engine/libsidplayfp.wasm" ] ||
-  die "the emulator is missing from the build; run source/engine/build.sh first"
+  die "the emulator is missing from the build; run source/engine/build-in-container.sh first"
 
 VERSION="$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$DIST/manifest.json" | head -1)"
 [ -n "$VERSION" ] || die "could not read the version out of the manifest"

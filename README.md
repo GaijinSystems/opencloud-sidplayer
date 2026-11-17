@@ -70,7 +70,7 @@ source/                  the app; build with npm
     sid-processor.js     AudioWorkletProcessor (stable)
     engine.js            libsidplayfp adapter (WASI stubs, memory, C API)
     engine.json          which files the main thread fetches for the worklet
-    libsidplayfp.wasm    built by engine/build.sh and committed, so a checkout runs without Emscripten
+    libsidplayfp.wasm    built by engine/build.sh, not tracked; engine.json pins its sha256
   scripts/prune-dist.mjs build stamp, defaults into manifest, prune
   scripts/               also the fixture builder and the engine and MUS-length checks
   dev/docker/            OpenCloud dev stack config
@@ -92,13 +92,12 @@ host if you have podman or docker; every command below has a container form.
 
 ```
 cd source/engine
-source /path/to/emsdk/emsdk_env.sh   # or: podman run --rm --userns=keep-id -v "$PWD/..":/app:z -w /app/engine docker.io/emscripten/emsdk:3.1.74@sha256:af45409f3199d88db4b1b03af0098532c8fb33a375ac257463eeb0a622870d06 ./build.sh
-./build.sh                           # -> public/vendor/sid-engine/libsidplayfp.wasm
+./build-in-container.sh              # -> public/vendor/sid-engine/libsidplayfp.wasm, in the pinned emsdk image
+                                     # (or ./build.sh with emsdk 3.1.74 on PATH)
 
 cd ..
 npm ci --legacy-peer-deps            # the OpenCloud packages pin peer ranges npm 10 will not resolve alone
-npm run fixtures                     # generates tests/fixtures/*.sid from hand-assembled 6502 code
-npm test
+npm test                             # first generates tests/fixtures/ from hand-assembled 6502 code
 npm run check:types
 npm run verify:engine                # drives the real wasm through the real worklet files in Node
 npm run build                        # -> dist/, with a build stamp in manifest.json
@@ -107,6 +106,13 @@ npm run build                        # -> dist/, with a build stamp in manifest.
 For the Node steps in a container, from the repository root, which is mounted
 whole so the build can copy `LICENSE` into the app and stamp the commit:
 `podman run --rm --userns=keep-id -v "$PWD":/app:z -w /app/source docker.io/library/node:22-bookworm@sha256:0e5f906573693feaa1e21057ebdcfdb5bd5021f050b2dc7c9deceb629c7da2a8 npm run build`.
+
+Neither the wasm nor the test fixtures are in git; both are built, and the
+build is reproducible. `engine.json` records the sha256 the engine build must
+produce, and `build.sh` refuses a binary that differs (after a deliberate
+change to `shim.cpp`, a patch or a version, build with `REPIN=1` and commit the
+new `engine.json`). `scripts/package.sh` builds the engine itself when it is
+missing.
 
 The app builds without the `.wasm` too, with a loud warning, and the player
 then reports exactly which file is missing. Useful for UI work; do not ship it.

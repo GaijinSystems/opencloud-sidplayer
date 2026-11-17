@@ -281,10 +281,10 @@ scripts/package.sh --skip-build    # package source/dist as it stands
 
 The build runs inside `docker.io/library/node:22-bookworm` when podman or
 docker is available, so nothing needs installing on the host. The emulator
-itself is built separately and much more rarely — see
-[`source/engine/README.md`](source/engine/README.md); `libsidplayfp.wasm` has
-to exist before packaging, and the script refuses to make a tarball without
-it.
+itself is not in the repository: when `libsidplayfp.wasm` is missing, the
+script builds it first in the pinned Emscripten image, which needs network
+access to fetch libsidplayfp, and the result must match the sha256 recorded in
+`engine.json` — see [`source/engine/README.md`](source/engine/README.md).
 
 The ROMs are included by default, as they are in the repository and the
 published release; `--no-roms` builds a tarball without them, named

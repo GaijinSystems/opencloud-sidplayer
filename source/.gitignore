@@ -9,3 +9,7 @@ public/vendor/sid-engine/*.bin
 !public/vendor/sid-engine/kernal.bin
 !public/vendor/sid-engine/basic.bin
 !public/vendor/sid-engine/chargen.bin
+# Built, not tracked: the emulator by engine/build.sh (engine.json pins its
+# hash), and the test fixtures by scripts/make-fixtures.mjs before the tests.
+public/vendor/sid-engine/libsidplayfp.wasm
+tests/fixtures/
