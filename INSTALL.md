@@ -1,4 +1,4 @@
-# Installing the SID Player
+# Installing OpenCloud SID Player
 
 The release tarball is the built app. There is nothing to compile.
 

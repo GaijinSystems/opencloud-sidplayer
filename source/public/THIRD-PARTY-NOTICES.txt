@@ -1,5 +1,5 @@
-Third-party components bundled with the SID Player for OpenCloud Web
-=====================================================================
+Third-party components bundled with OpenCloud SID Player
+========================================================
 
 libsidplayfp and reSIDfp
   https://github.com/libsidplayfp/libsidplayfp
@@ -18,4 +18,4 @@ C64 ROM images (kernal.bin, basic.bin, chargen.bin)
   remove them, or build with scripts/package.sh --no-roms, where that is
   not a redistribution you are able to make. Without them PSID tunes still play.
 
-The SID Player itself is AGPL-3.0, matching OpenCloud.
+OpenCloud SID Player itself is AGPL-3.0, matching OpenCloud.

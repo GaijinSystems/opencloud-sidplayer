@@ -1,4 +1,4 @@
-# SID Player for OpenCloud Web
+# OpenCloud SID Player
 
 Opens Commodore 64 `.sid` music files directly in the OpenCloud file manager —
 click a tune and it plays — and browses the whole High Voltage SID Collection
