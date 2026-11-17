@@ -2,8 +2,8 @@ sid-engine/
   sid-processor.js     AudioWorkletProcessor. Stable; do not edit per engine.
   engine.js            libsidplayfp adapter. Talks to libsidplayfp.wasm.
   engine.json          What the main thread must fetch, and what built the wasm.
-  libsidplayfp.wasm    Built by ../../../engine/build.sh, and tracked in git so
-                       that a checkout runs without an Emscripten toolchain.
+  libsidplayfp.wasm    Built by ../../../engine/build.sh or build-in-container.sh;
+                       not tracked in git. engine.json pins its sha256.
   kernal.bin           C64 ROM images, 8192 / 8192 / 4096 bytes, copyright
   basic.bin            Commodore and its successors; see THIRD-PARTY-NOTICES.
   chargen.bin          Needed for RSID and BASIC tunes; PSID plays without them.
@@ -14,10 +14,11 @@ the processor. The `engineBaseUrl` config key points at a directory for the
 same reason.
 
 engine.json's `build` block records the libsidplayfp and emsdk versions and the
-sha256 of the wasm beside it. build.sh writes it and scripts/prune-dist.mjs
-checks the hash, so a stale or foreign binary fails the build instead of
-looking exactly like the right one. Rebuilding the wasm means committing the
-engine.json that comes with it.
+sha256 of the wasm beside it. build.sh writes it, and refuses a build that
+does not reproduce a hash already recorded; scripts/prune-dist.mjs checks the
+hash again in dist/. So a stale or foreign binary fails the build instead of
+looking exactly like the right one. A deliberate change to the engine is
+built with REPIN=1 and its engine.json committed.
 
 Anything else dropped in this directory does NOT ship: prune-dist keeps only
 the files above and whatever engine.json names. That is how three unreferenced

@@ -31,7 +31,10 @@ done
 if [ "$RUNNER" = "podman" ]; then AS_USER=(--userns=keep-id); else AS_USER=(--user "$(id -u):$(id -g)" -e HOME=/tmp); fi
 
 # The app and the tunes, as committed, not as they happen to be checked out.
-WORK="$(mktemp -d "$HERE/.work.XXXXXX")"
+# A fixed name, not mktemp's: Vue derives scoped-style ids from file paths, so a
+# random folder would change the bundle on every build of the same sources.
+WORK="$HERE/.work.build"
+rm -rf "$WORK" && mkdir "$WORK"
 trap 'rm -rf "$WORK"' EXIT
 REPO="$(git -C "$ROOT" rev-parse --show-toplevel)"
 git -C "$REPO" archive "$APP_REF" source LICENSE | tar -x -C "$WORK"
@@ -42,6 +45,10 @@ git -C "$REPO" archive "$DEMO_REF" demo | tar -x -C "$WORK"
 find "$ROOT" -mindepth 1 -maxdepth 1 \
   ! -name _demo ! -name README.md ! -name CNAME ! -name .gitignore ! -name .git \
   -exec rm -rf {} +
+
+# The emulator is not in git, only the hash it must have; build it from the
+# app's sources the way a release does.
+"$WORK/source/engine/build-in-container.sh" >/dev/null
 
 INSIDE="/site/_demo/$(basename "$WORK")"
 # npm's cache in a volume of its own, so a rebuild does not fetch every package again.
