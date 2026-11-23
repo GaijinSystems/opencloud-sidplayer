@@ -17,8 +17,17 @@ through the first second. See [`docs/engine-contract.md`](docs/engine-contract.m
 two halves talk and [`docs/hvsc-library.md`](docs/hvsc-library.md) for how the
 library reads and syncs a collection.
 
-What has been verified, all inside podman containers, most recently on
-2026-11-16. It is also in everyday use on OpenCloud 9.1.0 rolling.
+**Needs OpenCloud 7.2.5 or newer.** The smoke, library and Compute's Gazette
+browser tests below pass in full against OpenCloud 7.2.5 (stable), 8.1.0, 9.1.0
+and 9.2.0 (rolling), with 1.2.2 on 2026-11-22. On 6.0.0 the player plays, but
+a click opens the full view instead of playing in Files, the library's first
+sync fails on some files with server errors, and later library checks fail
+too; versions between 6.0.0 and 7.2.5 were not tried.
+
+What has been verified, all inside podman containers; the table below was last
+run in full on 2026-11-16, and its smoke, library and Compute's Gazette rows
+again on 2026-11-22, as above.
+It is also in everyday use on OpenCloud 9.1.0 rolling.
 
 | Layer | How | Result |
 |---|---|---|
@@ -76,7 +85,7 @@ source/                  the app; build with npm
   dev/docker/            OpenCloud dev stack config
   eslint.config.js       lint rules, including the AudioWorklet's own globals
 LICENSE                  AGPL-3.0, the licence the app is under
-scripts/package.sh       builds the installable tarball and its checksums
+scripts/package.sh       builds the release files: the tarball, the zip and SHA256SUMS
 deploy/csp.yaml          the one required policy change
 deploy/haproxy-hvsc.cfg  the mirror path the library needs, for your front proxy
 docs/engine-contract.md  how the main thread, the worklet and the engine fit together
@@ -155,12 +164,12 @@ build that changes the JavaScript, not just the first.
 ## Install
 
 Each [release](https://github.com/GaijinSystems/opencloud-sidplayer/releases)
-carries a tarball whose single top-level directory is `sidplayer/`, so it
-extracts straight into the apps folder:
+carries a tarball and a zip whose single top-level directory is `sidplayer/`,
+so either extracts straight into the apps folder:
 
 ```
-sha256sum -c opencloud-sidplayer-1.2.1.tar.gz.sha256
-tar -xzf opencloud-sidplayer-1.2.1.tar.gz -C "$WEB_ASSET_APPS_PATH"
+sha256sum -c opencloud-sidplayer-1.2.2.tar.gz.sha256
+tar -xzf opencloud-sidplayer-1.2.2.tar.gz -C "$WEB_ASSET_APPS_PATH"
 ```
 
 `scripts/package.sh` builds the same tarball into `release/`.

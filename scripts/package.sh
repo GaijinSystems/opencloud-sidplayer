@@ -1,28 +1,30 @@
 #!/usr/bin/env bash
 #
-# Packages the built app into a tarball that extracts straight into
+# Packages the built app into a tarball and a zip that extract straight into
 # OpenCloud's apps folder, and puts the release files in release/: the
-# tarball, the list of what is inside it (<name>.SHA256SUMS), and the two
-# files for the server, csp.yaml and haproxy-hvsc.cfg. Nothing else; release/
-# is emptied first. The release workflow writes a <file>.sha256 beside each.
+# tarball, the zip (in the layout OpenCloud's app store uses), the list of
+# what is inside them (<name>.SHA256SUMS), and the two files for the server,
+# csp.yaml and haproxy-hvsc.cfg. Nothing else; release/ is emptied first. The
+# release workflow writes a <file>.sha256 beside each.
 #
 # The same commit packages to the same bytes: the build time recorded in the
-# manifest and every time in the tarball are the commit's.
+# manifest and every time in the tarball and the zip are the commit's.
 #
 #   scripts/package.sh                 build, then package with the ROMs
 #   scripts/package.sh --no-roms       package without them
 #   scripts/package.sh --skip-build    package source/dist as it stands
 #
-# The tarball's top-level directory is `sidplayer/`, so
+# The top-level directory of both is `sidplayer/`, so
 #
 #   tar -xzf opencloud-sidplayer-<version>.tar.gz -C "$WEB_ASSET_APPS_PATH"
 #
-# puts `manifest.json` exactly where the web service looks for it.
+# (or unzipping the zip there) puts `manifest.json` exactly where the web
+# service looks for it.
 #
 # About the ROMs: the C64 kernal, BASIC and character ROMs are Commodore's,
 # not this project's, and are included by default, as they are in the
 # repository, because RSID tunes need the kernal to play at all. `--no-roms`
-# builds a tarball without them, for whoever wants one; the app then plays PSID
+# builds the archives without them, for whoever wants them; the app then plays PSID
 # tunes and says which file is missing for the rest.
 #
 # And they are PUBLIC once installed. Everything in the app folder is served
@@ -72,6 +74,7 @@ for candidate in podman docker; do
     break
   fi
 done
+command -v zip >/dev/null 2>&1 || die "zip (Info-ZIP) is needed to write the zip"
 
 # A fixed length: --short alone grows with the repository, and a shallow CI
 # checkout and a full clone would stamp the same commit differently.
@@ -79,8 +82,8 @@ COMMIT="$(git -C "$HERE" rev-parse --short=12 HEAD 2>/dev/null || echo unknown)"
 # Under CI the commit is what is being released, so git has to answer: with no
 # commit, the clean check below would check nothing.
 [ "${CI:-}" != true ] || [ "$COMMIT" != unknown ] || die "git cannot read the commit; a CI build needs it"
-# The commit's time, for the manifest's builtAt and the tarball's mtimes, so
-# that a rebuild of the same commit is the same bytes.
+# The commit's time, for the manifest's builtAt and every time in the
+# archives, so that a rebuild of the same commit is the same bytes.
 SOURCE_DATE_EPOCH="$(git -C "$HERE" log -1 --format=%ct 2>/dev/null || date +%s)"
 # Dirty if anything the build reads differs from the commit, new files
 # included: `git diff` alone misses an untracked file, and a build carrying
@@ -165,32 +168,36 @@ fi
 # Anything that should never ship, whatever ends up in dist.
 find "$STAGE" \( -name '.DS_Store' -o -name '*.map' -o -name 'Thumbs.db' \) -delete
 
-# One mode for every file and one for every folder. Nothing in the app is
-# executable, and a file's mode otherwise depends on how it arrived: the wasm
-# is 0755 straight from the linker and 0644 as a downloaded CI artifact, so the
-# same commit packaged two different tarballs.
+# One mode for every file and one for every folder, and the commit's time on
+# everything, on disk, so that both archives take the tree as it is. Nothing in
+# the app is executable, and a file's mode otherwise depends on how it
+# arrived: the wasm is 0755 straight from the linker and 0644 as a downloaded
+# CI artifact, so the same commit packaged two different tarballs.
 find "$STAGE" -type f -exec chmod 0644 {} +
 find "$STAGE" -type d -exec chmod 0755 {} +
+find "$STAGE/sidplayer" -exec touch -h -d "@${SOURCE_DATE_EPOCH}" {} +
 
 # --- tar ---------------------------------------------------------------------
 # release/ holds this release's files and nothing else, so it starts empty.
 rm -rf "$OUT"
 mkdir -p "$OUT"
 
-# The same bytes from the same commit: sorted, no owner names, the commit's
-# time on every entry, one set of modes, gzip without its own timestamp.
-#
-# The modes were set above; --mode only restates them, so that tar alone would
-# not put a builder's umask into the archive. (Its X keeps an executable file
-# executable, which is why the chmod comes first.)
+# The same bytes from the same commit: the modes and times set above, entries
+# sorted, no owner names, gzip without its own timestamp.
 say "writing ${TARBALL##*/}"
 tar --sort=name \
   --owner=0 --group=0 --numeric-owner \
-  --mtime="@${SOURCE_DATE_EPOCH}" \
-  --mode='u+rwX,go+rX,go-w' \
   --format=gnu \
   -I 'gzip -9n' \
   -C "$STAGE" -cf "$TARBALL" sidplayer
+
+# The same folder as a zip, the format OpenCloud's app store uses.
+# Reproducible the same way: the modes and times set above, the entries in a
+# fixed order from a list, -X leaving out owners and the extra Unix times, and
+# TZ=UTC fixing the local time zip records.
+ZIP="$OUT/${NAME}.zip"
+say "writing ${ZIP##*/}"
+(cd "$STAGE" && find sidplayer -print | LC_ALL=C sort | TZ=UTC zip -q -X -9 -@ "$ZIP")
 
 # --- the files that do not belong inside the app folder ----------------------
 #
@@ -199,11 +206,11 @@ tar --sort=name \
 # installation (verified with no apps.yaml present at all - the app appears
 # and runs on the manifest's own defaults). But two files do have to go
 # elsewhere, and they are instance-level, merged into configuration an
-# operator already has. They travel beside the tarball rather than inside it,
+# operator already has. They travel beside the archives rather than inside them,
 # because anything inside the app folder is served to browsers, and these are
 # for the server.
 cp "$HERE/deploy/csp.yaml" "$HERE/deploy/haproxy-hvsc.cfg" "$OUT/"
-say "beside it: csp.yaml (required) and haproxy-hvsc.cfg (library only)"
+say "beside them: csp.yaml (required) and haproxy-hvsc.cfg (library only)"
 
 # --- what is inside ----------------------------------------------------------
 # Paths start at sidplayer/: check with `sha256sum -c <name>.SHA256SUMS` in the
@@ -214,7 +221,8 @@ SIZE="$(du -h "$TARBALL" | cut -f1)"
 FILES="$(tar -tzf "$TARBALL" | grep -vc '/$' || true)"
 say "done: $SIZE, $FILES files, version $VERSION, commit ${COMMIT}${DIRTY}"
 say "install: tar -xzf ${NAME}.tar.gz -C \"\$WEB_ASSET_APPS_PATH\" && restart the web service"
+say "     or: unzip ${NAME}.zip -d \"\$WEB_ASSET_APPS_PATH\""
 if command -v gpg >/dev/null 2>&1 && gpg --list-secret-keys >/dev/null 2>&1 &&
   [ -n "$(gpg --list-secret-keys 2>/dev/null)" ]; then
-  say "sign:    gpg --armor --detach-sign ${TARBALL##*/}"
+  say "sign:    gpg --armor --detach-sign ${TARBALL##*/} && gpg --armor --detach-sign ${ZIP##*/}"
 fi

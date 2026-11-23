@@ -101,7 +101,7 @@ const cgscSettled = () =>
   )
 
 /** The Compute's section heading, which is also the "is it there" test. */
-const section = library.getByText(/Compute.s Gazette SIDs/)
+const section = library.getByText(/Compute.s Gazette MUS/)
 
 try {
   /* ---- put a collection there ------------------------------------------ */

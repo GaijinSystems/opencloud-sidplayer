@@ -3,6 +3,24 @@
 Each section below is written to stand on its own as the notes for that
 release.
 
+## 1.2.2
+
+Mostly packaging, and one label.
+
+- **The library's left panel heads the second collection "Compute's Gazette
+  MUS"**, not "Compute's Gazette SIDs": its tunes are Sidplayer `.mus` files,
+  not SID files.
+- **A zip beside the tarball.** `opencloud-sidplayer-<version>.zip` holds the
+  same `sidplayer/` folder, in the layout OpenCloud's app store uses.
+  Unzipping it into the apps folder works as unpacking the tarball does.
+- **Releases can be rebuilt exactly.** Every packaged file is 0644 and every
+  folder 0755, whatever mode the build left them with, so packaging a
+  release's commit, with the same gzip and zip, gives the published tarball
+  and zip byte for byte.
+- **The manifest names its author**, GaijinSystems.
+- **Needs OpenCloud 7.2.5 or newer.** The browser tests pass in full on
+  7.2.5, 8.1.0, 9.1.0 and 9.2.0; 6.0.0 falls short, as the README describes.
+
 ## 1.2.1
 
 The first release built and published by the release workflow, and the

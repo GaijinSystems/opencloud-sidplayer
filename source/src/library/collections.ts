@@ -65,7 +65,7 @@ export const COLLECTIONS: Record<Collection, CollectionInfo> = {
     key: 'cgsc',
     label: 'Compute’s Gazette SID Collection',
     shortLabel: 'Compute’s Gazette',
-    treeLabel: 'Compute’s Gazette SIDs',
+    treeLabel: 'Compute’s Gazette MUS',
     optional: true,
     mirrored: false,
     headers: false,

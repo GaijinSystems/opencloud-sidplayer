@@ -1,11 +1,15 @@
 # Installing OpenCloud SID Player
 
+Needs OpenCloud 7.2.5 or newer; the README says what was tested on which
+version.
+
 The release tarball is the built app. There is nothing to compile. Each
 [release](https://github.com/GaijinSystems/opencloud-sidplayer/releases) has
 these files, each with a `.sha256` beside it:
 
 ```
 opencloud-sidplayer-<version>.tar.gz          the app
+opencloud-sidplayer-<version>.zip             the same, as a zip in the app store's layout
 opencloud-sidplayer-<version>.SHA256SUMS      checks an installed copy, from $WEB_ASSET_APPS_PATH
 csp.yaml                                      required, step 2
 haproxy-hvsc.cfg                              only for the library, step 4
@@ -22,7 +26,7 @@ served to browsers, and those two are for the server.
 
 Or build them with `scripts/package.sh`, which puts the same files in
 `release/` (without the `.sha256` files); see
-[Building a tarball](#building-a-tarball) at the end.
+[Building the release files](#building-the-release-files) at the end.
 
 ## 1. Check and unpack
 
@@ -33,10 +37,12 @@ sha256sum -c ./*.sha256
 tar -xzf opencloud-sidplayer-<version>.tar.gz -C "$WEB_ASSET_APPS_PATH"
 ```
 
-The tarball's one top-level directory is `sidplayer/`, so this lands as
-`$WEB_ASSET_APPS_PATH/sidplayer/manifest.json` — exactly where the web service
-looks. `WEB_ASSET_APPS_PATH` defaults to `$OC_BASE_DATA_PATH/web/assets/apps`,
-commonly `/var/lib/opencloud/web/assets/apps`; under opencloud-compose the
+(Or `unzip opencloud-sidplayer-<version>.zip -d "$WEB_ASSET_APPS_PATH"`.) The
+tarball's one top-level directory is `sidplayer/`, as is the zip's, so this
+lands as `$WEB_ASSET_APPS_PATH/sidplayer/manifest.json` — exactly where the
+web service looks. `WEB_ASSET_APPS_PATH` defaults to
+`$OC_BASE_DATA_PATH/web/assets/apps`, commonly
+`/var/lib/opencloud/web/assets/apps`; under opencloud-compose the
 host path is `config/opencloud/apps/`, because the apps mount shadows the data
 directory.
 
@@ -170,12 +176,12 @@ ROMs. The standard tarball includes them: `kernal.bin`, `basic.bin` and
 `chargen.bin` in `sidplayer/vendor/sid-engine/`. They are Commodore's, copyright
 its successors, and not under this project's licence.
 
-A tarball built with `scripts/package.sh --no-roms` leaves them out (see
-[Building a tarball](#building-a-tarball)); the player then plays PSID tunes
-and names the file it needs for the rest. To add them to such an install later,
-drop the three files (8192, 8192 and 4096 bytes) into
-`sidplayer/vendor/sid-engine/` and restart; `engine.json` already lists them as
-optional.
+A build with `scripts/package.sh --no-roms` leaves them out (see
+[Building the release files](#building-the-release-files)); the player then
+plays PSID tunes and names the file it needs for the rest. To add them to
+such an install later, drop the three files (8192, 8192 and 4096 bytes) into
+`sidplayer/vendor/sid-engine/` and restart; `engine.json` already lists them
+as optional.
 
 **Be aware of what that publishes.** Everything in the app folder is served to
 browsers without authentication, so with the ROMs installed
@@ -273,7 +279,7 @@ per-device preferences live in the browser.
 Delete `$WEB_ASSET_APPS_PATH/sidplayer/` and restart. The collection stays: it
 is the user's own data, in their own space.
 
-## Building a tarball
+## Building the release files
 
 ```
 scripts/package.sh                 # build, then package, ROMs included
@@ -282,20 +288,20 @@ scripts/package.sh --skip-build    # package source/dist as it stands
 ```
 
 The build runs inside `docker.io/library/node:22-bookworm` when podman or
-docker is available, so nothing needs installing on the host. The emulator
-itself is not in the repository: when `libsidplayfp.wasm` is missing, the
+docker is available; besides that, the host needs git, GNU tar, gzip and
+Info-ZIP `zip`. The emulator itself is not in the repository: when `libsidplayfp.wasm` is missing, the
 script builds it first in the pinned Emscripten image, which needs network
 access to fetch libsidplayfp, and the result must match the sha256 recorded in
 `engine.json` — see [`source/engine/README.md`](source/engine/README.md).
 
 The ROMs are included by default, as they are in the repository and the
-published release; `--no-roms` builds a tarball without them, named
-`opencloud-sidplayer-<version>-no-roms.tar.gz`.
+published release; `--no-roms` builds a tarball and a zip without them,
+`opencloud-sidplayer-<version>-no-roms.tar.gz` and `.zip`.
 
 The files land in `release/`, which is emptied first. A build of a clean
 checkout is reproducible: the manifest's `builtAt` and every time in the
-tarball are the commit's, so packaging the same commit twice, with the same
-gzip, gives the same bytes.
+tarball and the zip are the commit's, so packaging the same commit twice, with
+the same gzip and zip, gives the same bytes.
 
 ## Releasing
 
